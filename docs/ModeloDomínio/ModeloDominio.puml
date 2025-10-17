@@ -56,3 +56,5 @@ title Domain Model Diagram
     Review "*" o-- "1" Music
     Album "1" o-- "*" Music
     Artist "1" o-- "*" Album
+
+@enduml
