@@ -24,4 +24,16 @@ package "com.lvhm.covertocover.models" as models_package {
         - name : String
         - birthdate : Date
         - sex : String
+    }
+
+    class Playlist {
+         - name : String
+         - createdby : String
+         - totalduration : float
+    }
+
+    class Review {
+        - pontuation : int
+        - description : String
+    }
 
