@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+top to bottom direction
+skinparam linetype ortho
+title Domain Model Diagram
+
+package "com.lvhm.covertocover.models" as models_package {
+    class User {
+        - name : String
+        - adress : String
+        - phone_number : String
+        - email : String
+    }
+
+    class Music {
+        - name: String
+        - publication_date : Date
+        - duration : timestamp
+    }
+
+    class Artist {
+        - name : String
+        - birthdate : Date
+        - sex : String
+
