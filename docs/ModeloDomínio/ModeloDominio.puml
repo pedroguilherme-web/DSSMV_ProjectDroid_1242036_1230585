@@ -31,6 +31,12 @@ title Domain Model Diagram
          - totalduration : float
     }
 
+     class Album {
+          - name : String
+          - name : String
+          - lauchdate : Date
+     }
+
     class Review {
         - pontuation : int
         - description : String
@@ -39,10 +45,14 @@ title Domain Model Diagram
     class User_playlist {
          - name : String
          - name : String
+    }
 
-
-    Playlist "*" o-- "1" User
+    User "1" o-- "*" Playlist
+    User "*" o-- "*" Playlist
+    Artist "1" o-- "*" Music
+    Music "*" o-- "1" Artist
+    Playlist "*" o-- "*" Music
+    User "1" o-- "*" Review
     Review "*" o-- "1" Music
-
-
-
+    Album "1" o-- "*" Music
+    Artist "1" o-- "*" Album
