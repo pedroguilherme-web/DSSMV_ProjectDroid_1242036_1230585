@@ -6,7 +6,6 @@ top to bottom direction
 skinparam linetype ortho
 title Domain Model Diagram
 
-package "com.lvhm.covertocover.models" as models_package {
     class User {
         - name : String
         - adress : String
@@ -36,4 +35,10 @@ package "com.lvhm.covertocover.models" as models_package {
         - pontuation : int
         - description : String
     }
+
+
+    Playlist "*" o-- "1" User
+    Review "*" o-- "1" Music
+
+
 
