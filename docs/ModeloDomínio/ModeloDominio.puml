@@ -36,6 +36,10 @@ title Domain Model Diagram
         - description : String
     }
 
+    class User_playlist {
+         - name : String
+         - name : String
+
 
     Playlist "*" o-- "1" User
     Review "*" o-- "1" Music
