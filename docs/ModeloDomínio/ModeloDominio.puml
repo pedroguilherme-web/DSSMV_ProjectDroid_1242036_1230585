@@ -4,7 +4,7 @@
 hide circle
 top to bottom direction
 skinparam linetype ortho
-title Domain Model Diagram
+title Domain Model Diagram (Reorganized)
 
 class User {
     - name : String
@@ -40,6 +40,12 @@ class Review {
     - description : String
 }
 
+class PlaylistMusic {
+
+}
+class UserPlaylist {
+
+}
 
 User "1" -- "*" Playlist : creates
 User "1" -- "*" Review : writes
@@ -47,7 +53,9 @@ Review "*" -- "1" Music : about
 Artist "1" -- "*" Music : performs
 Album "1" -- "*" Music : contains
 Artist "1" -- "*" Album : produces
-Playlist "*" -- "*" Music : includes
-User "*" -- "*" Playlist : subscribes
+Playlist "1" -- "*" PlaylistMusic : contains
+Music "1" -- "*" PlaylistMusic : included_in
+User "1" -- "*" UserPlaylist : subscribes
+Playlist "1" -- "*" UserPlaylist : subscribed_by
 
 @enduml
