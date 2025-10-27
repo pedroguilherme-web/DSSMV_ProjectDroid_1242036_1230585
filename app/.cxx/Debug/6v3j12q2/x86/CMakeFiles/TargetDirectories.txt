@@ -1,0 +1,3 @@
+C:/Users/Utilizador/StudioProjects/DSSMV_ProjectDroid_1242036_1230585/app/.cxx/Debug/6v3j12q2/x86/CMakeFiles/myapplication.dir
+C:/Users/Utilizador/StudioProjects/DSSMV_ProjectDroid_1242036_1230585/app/.cxx/Debug/6v3j12q2/x86/CMakeFiles/edit_cache.dir
+C:/Users/Utilizador/StudioProjects/DSSMV_ProjectDroid_1242036_1230585/app/.cxx/Debug/6v3j12q2/x86/CMakeFiles/rebuild_cache.dir
