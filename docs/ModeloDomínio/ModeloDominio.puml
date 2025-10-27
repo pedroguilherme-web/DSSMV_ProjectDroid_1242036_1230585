@@ -54,8 +54,8 @@ Artist "1" -- "*" Music : performs
 Album "1" -- "*" Music : contains
 Artist "1" -- "*" Album : produces
 Playlist "1" -- "*" PlaylistMusic : contains
-Music "1" -- "*" PlaylistMusic : included_in
+Music "1" -- "*" PlaylistMusic : included in
 User "1" -- "*" UserPlaylist : subscribes
-Playlist "1" -- "*" UserPlaylist : subscribed_by
+Playlist "1" -- "*" UserPlaylist : subscribed by
 
 @enduml
