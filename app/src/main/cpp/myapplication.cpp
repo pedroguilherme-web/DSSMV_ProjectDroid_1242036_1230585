@@ -4,12 +4,12 @@
 //
 // For instance,
 //
-// In MainActivity.java:
+// In com.example.Apoloplay.MainActivity.java:
 //    static {
 //       System.loadLibrary("myapplication");
 //    }
 //
-// Or, in MainActivity.kt:
+// Or, in com.example.Apoloplay.MainActivity.kt:
 //    companion object {
 //      init {
 //         System.loadLibrary("myapplication")
