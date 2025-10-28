@@ -1,61 +1,80 @@
-package com.example.Apoloplay.ui
+package com.example.Apoloplay.ui;
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.Apoloplay.R
-import com.example.Apoloplay.data.SpotifyService
-import com.example.Apoloplay.models.Music
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-class MainActivity : AppCompatActivity() {
+import com.example.Apoloplay.R;
+import com.example.Apoloplay.data.SpotifyService;
+import com.example.Apoloplay.models.Music;
+import com.example.Apoloplay.MusicAdapter;
+import com.example.Apoloplay.data.SpotifyResponse;
 
-    private lateinit var recyclerView: RecyclerView
+import java.util.ArrayList;
+import java.util.List;
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+public class MainActivity extends AppCompatActivity {
 
-        fetchSpotifyTracks("dua lipa") // exemplo
+    private RecyclerView recyclerView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        fetchSpotifyTracks("dua lipa"); // exemplo
     }
 
-    private fun fetchSpotifyTracks(query: String) {
-        val retrofit = Retrofit.Builder()
+    private void fetchSpotifyTracks(String query) {
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .build()
+                .build();
 
-        val service = retrofit.create(SpotifyService::class.java)
+        SpotifyService service = retrofit.create(SpotifyService.class);
 
-        val token = "Bearer TEU_TOKEN_AQUI"
-        val call = service.searchTracks(token, query)
+        String token = "Bearer TEU_TOKEN_AQUI";
+        Call<SpotifyResponse> call = service.searchTracks(token, query);
 
-        call.enqueue(object : Callback<com.pedroguilherme_web.dssmv_projectdroid.data.SpotifyResponse> {
-            override fun onResponse(
-                    call: Call<com.example.Apoloplay.data.SpotifyResponse>,
-            response: Response<com.example.Apoloplay.data.SpotifyResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val tracks = response.body()?.tracks?.items ?: emptyList()
-                    val musicList = tracks.map {
-                        val imageUrl = it.album.images.firstOrNull()?.url ?: ""
-                        Music(it.name, it.artists.firstOrNull()?.name ?: "Desconhecido", imageUrl)
+        call.enqueue(new Callback<SpotifyResponse>() {
+            @Override
+            public void onResponse(Call<SpotifyResponse> call, Response<SpotifyResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<SpotifyResponse.TrackItem> tracks = response.body().getTracks().getItems();
+                    List<Music> musicList = new ArrayList<>();
+
+                    for (SpotifyResponse.TrackItem track : tracks) {
+                        String imageUrl = "";
+                        if (track.getAlbum().getImages() != null && !track.getAlbum().getImages().isEmpty()) {
+                            imageUrl = track.getAlbum().getImages().get(0).getUrl();
+                        }
+
+                        String artistName = "Desconhecido";
+                        if (track.getArtists() != null && !track.getArtists().isEmpty()) {
+                            artistName = track.getArtists().get(0).getName();
+                        }
+
+                        musicList.add(new Music(track.getName(), artistName, imageUrl));
                     }
-                    recyclerView.adapter = MusicAdapter(musicList)
+
+                    recyclerView.setAdapter(new MusicAdapter(musicList));
                 }
             }
 
-            override fun onFailure(call: Call<com.example.Apoloplay.data.SpotifyResponse>, t: Throwable) {
-                t.printStackTrace()
+            @Override
+            public void onFailure(Call<SpotifyResponse> call, Throwable t) {
+                t.printStackTrace();
             }
-        })
+        });
     }
 }
