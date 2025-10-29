@@ -26,7 +26,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     @NonNull
     @Override
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // ⚠️ Necessita de um layout item_music.xml (que você deve criar)
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_music, parent, false);
         return new MusicViewHolder(view);
@@ -63,7 +62,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
         public MusicViewHolder(@NonNull View itemView) {
             super(itemView);
-            // ⚠️ IDs de views (que devem estar em item_music.xml)
             titleTextView = itemView.findViewById(R.id.music_title);
             artistTextView = itemView.findViewById(R.id.music_artist);
             coverImageView = itemView.findViewById(R.id.music_cover);
