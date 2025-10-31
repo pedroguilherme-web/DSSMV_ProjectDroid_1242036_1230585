@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
 
-    <!-- Campo de pesquisa -->
-    <EditText
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:padding="12dp"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context=".View.MainActivity">
+
+<!-- Campo de pesquisa -->
+<EditText
         android:id="@+id/searchInput"
         android:hint="Procurar música..."
         android:imeOptions="actionSearch"
@@ -19,8 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- RecyclerView para a lista de músicas -->
-    <androidx.recyclerview.widget.RecyclerView
+<!-- RecyclerView para a lista de músicas -->
+<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_marginTop="8dp"
         android:layout_width="match_parent"
