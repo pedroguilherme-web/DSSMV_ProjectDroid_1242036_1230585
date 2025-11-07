@@ -31,7 +31,7 @@ public class SearchRepositoryImpl implements SearchRepository {
 
     public SearchRepositoryImpl() {
         this.auth = RetrofitProvider.provideAuthRetrofit().create(AuthTokenService.class);
-        this.api  = RetrofitProvider.provideAuthRetrofit().create(SpotifyService.class);
+        this.api  = RetrofitProvider.provideApiRetrofit().create(SpotifyService.class);
     }
 
     @Override
