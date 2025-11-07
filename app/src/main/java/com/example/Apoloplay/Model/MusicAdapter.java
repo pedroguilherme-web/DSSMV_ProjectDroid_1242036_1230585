@@ -14,21 +14,25 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Adaptador para exibir a lista de objetos Music no RecyclerView.
- */
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
 
-    private List<Music> musicList;
-
-    public MusicAdapter(List<Music> musicList) {
-        this.musicList = musicList;
+    // 1. Interface de Callback (para notificar a Activity)
+    public interface OnMusicClickListener {
+        void onMusicClick(Music music);
     }
 
+    private List<Music> musicList;
+    private final OnMusicClickListener clickListener; // Variável para o listener
+
+    // 2. Construtor modificado para aceitar o listener
+    public MusicAdapter(List<Music> musicList, OnMusicClickListener clickListener) {
+        this.musicList = musicList;
+        this.clickListener = clickListener;
+    }
 
     public void setMusicList(List<Music> newMusicList) {
         this.musicList = newMusicList;
-
+        // Não é necessário chamar notifyDataSetChanged aqui, pois a Activity o faz.
     }
 
     @NonNull
@@ -45,6 +49,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
         holder.titleTextView.setText(music.getTitle());
         holder.artistTextView.setText(music.getArtist());
+
+        // 3. Lógica de Clique: Se o listener existe, chamá-lo ao clicar
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onMusicClick(music);
+            }
+        });
 
 
         if (music.getImageUrl() != null && !music.getImageUrl().isEmpty()) {
@@ -75,6 +86,4 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             coverImageView = itemView.findViewById(R.id.music_cover);
         }
     }
-
-
 }

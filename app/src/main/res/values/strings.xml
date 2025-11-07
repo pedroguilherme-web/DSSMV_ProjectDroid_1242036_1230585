@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">ApoloPlay</string>
-
+    <string name="ver_playlists">Ver playlists</string>
+    <string name="pesquisar_hint">Pesquisar músicas…</string>
     <string name="music_cover_description">Capa do álbum da música.</string>
+    <string name="definicoes">definições</string>
+
 
 </resources>

@@ -1,13 +1,8 @@
 package com.example.Apoloplay.Model.spotify;
 
-
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-/**
- * Mapeia a resposta JSON completa do endpoint /search do Spotify.
- * A estrutura foi simplificada para incluir apenas os campos essenciais que você utiliza.
- */
 public class SpotifyResponse {
 
     @SerializedName("tracks")
@@ -36,16 +31,27 @@ public class SpotifyResponse {
         @SerializedName("album")
         private Album album;
 
+        @SerializedName("preview_url")
+        private String previewUrl;
+
+        public String getPreviewUrl() {
+            return previewUrl;
+        }
+
+        @SerializedName("uri")
+        private String uri;
+
         public String getName() {
             return name;
         }
-
         public List<Artist> getArtists() {
             return artists;
         }
-
         public Album getAlbum() {
             return album;
+        }
+        public String getUri() {
+            return uri;
         }
     }
 
@@ -62,8 +68,19 @@ public class SpotifyResponse {
         @SerializedName("images")
         private List<Image> images;
 
+        @SerializedName("name")
+        private String name;
+        @SerializedName("release_date")
+        private String releaseDate;
+
         public List<Image> getImages() {
             return images;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getReleaseDate() {
+            return releaseDate;
         }
     }
 

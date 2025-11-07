@@ -6,36 +6,74 @@ android {
     namespace = "com.example.Apoloplay"
     compileSdk = 36
 
-    // --- BLOCO DEFAULTCONFIG ÚNICO ---
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.example.Apoloplay"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // Mantemos a correção do Desugar/MultiDex aqui
         multiDexEnabled = true
-    }
-    // ----------------------------------
 
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+
+    // --- Add manifest placeholders here ---
+    manifestPlaceholders["redirectSchemeName"] = "com.example.apoloplay"
+    manifestPlaceholders["redirectHostName"] = "callback"
+}
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        getByName("debug") {
+            isMinifyEnabled = false //
+        }
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+
+    packaging {
+        resources {
+            excludes += setOf(
+                "/META-INF/*.kotlin_module",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
+    }
+
+    // ✅ isto estava dentro do packaging — agora está no sítio certo
+    lint {
+        abortOnError = false
     }
 }
 
+
+
+
+
 dependencies {
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     // --- Dependência do Desugar adicionada corretamente ---
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.0")
+
+    implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+    //implementation(files("libs/spotify-auth-release-2.1.0.aar"))
+    implementation(files("libs/spotify-auth-store-release-2.1.0.aar"))
+
+
+
 
     // Networking e Imagens
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -53,4 +91,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-}
+    }
+
+
+
+
