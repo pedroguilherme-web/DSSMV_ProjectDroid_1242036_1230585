@@ -16,9 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.Apoloplay.Model.Playlist; // <- se já migraste este para domain, ajusta o import
 import com.example.Apoloplay.R;
-import com.example.Apoloplay.ViewModel.PlaylistsViewModel; // <- o VM antigo que já tinhas para criar/adicionar
+import com.example.Apoloplay.domain.model.Playlist;                // domain model
+import com.example.Apoloplay.ui.playlists.PlaylistsUiState;       // ui state (novo)
+import com.example.Apoloplay.ui.playlists.PlaylistsViewModel;     // VM (novo)
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -39,16 +40,18 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
         return f;
     }
 
-    private PlaylistsViewModel vm; // VM que já usavas para criar/adicionar
+    private PlaylistsViewModel vm; // VM novo
     private RecyclerView rv;
     private ProgressBar progress;
     private TextView empty;
     private MaterialButton btnCreate;
     private PlaylistsAdapter adapter;
-    private String trackUri;
-    private String lastPickedPlaylistId; // guardamos a playlist onde foi adicionada
 
-    @Nullable @Override
+    private String trackUri;
+    private String lastPickedPlaylistId;
+
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_to_playlist, container, false);
         rv = v.findViewById(R.id.rv_playlists);
@@ -58,7 +61,7 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
 
         adapter = new PlaylistsAdapter(new ArrayList<>(), playlist -> {
             if (playlist == null) return;
-            lastPickedPlaylistId = playlist.id; // <- importante para o broadcast
+            lastPickedPlaylistId = playlist.id;
             vm.addTrackToPlaylist(playlist.id, trackUri);
         });
 
@@ -69,36 +72,26 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
         return v;
     }
 
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         trackUri = getArguments() != null ? getArguments().getString(ARG_TRACK_URI) : null;
 
         vm = new ViewModelProvider(this).get(PlaylistsViewModel.class);
 
-        vm.loadMyPlaylists();
-
-        vm.getLoading().observe(getViewLifecycleOwner(),
-                loading -> progress.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE));
-
-        vm.getPlaylists().observe(getViewLifecycleOwner(), list -> {
-            boolean isEmpty = (list == null || list.isEmpty());
-            rv.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-            empty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
-            adapter.submit(list);
-        });
+        vm.getState().observe(getViewLifecycleOwner(), this::renderState);
 
         vm.getError().observe(getViewLifecycleOwner(), err -> {
-            if (err != null && !err.isEmpty())
+            if (err != null && !err.isEmpty()) {
                 Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
+            }
         });
 
         vm.getAddTrackSuccess().observe(getViewLifecycleOwner(), ok -> {
             if (Boolean.TRUE.equals(ok)) {
-                // emite o broadcast: quem estiver interessado (PlaylistsActivity) atualiza
                 android.content.Intent intent = new android.content.Intent(ACTION_PLAYLIST_CHANGED);
                 intent.putExtra("playlist_id", lastPickedPlaylistId);
                 requireContext().sendBroadcast(intent);
-
                 Toast.makeText(getContext(), "Adicionada à playlist!", Toast.LENGTH_SHORT).show();
                 dismiss();
             }
@@ -106,10 +99,25 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
 
         vm.getCreatedPlaylist().observe(getViewLifecycleOwner(), created -> {
             if (created != null) {
-                vm.loadMyPlaylists();
+                vm.refresh();
                 Toast.makeText(getContext(), "Playlist criada", Toast.LENGTH_SHORT).show();
             }
         });
+
+        vm.refresh();
+    }
+
+    private void renderState(PlaylistsUiState s) {
+        progress.setVisibility(s.loading ? View.VISIBLE : View.GONE);
+
+        boolean isEmpty = (s.items == null || s.items.isEmpty());
+        rv.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        empty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        adapter.submit(s.items != null ? s.items : new ArrayList<>());
+
+        if (s.error != null && !s.error.isEmpty()) {
+            Toast.makeText(getContext(), s.error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showCreateDialog() {
@@ -133,29 +141,29 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
         private List<Playlist> data;
         private final OnClick onClick;
 
-        PlaylistsAdapter(List<Playlist> d, OnClick c){ data = d; onClick = c; }
+        PlaylistsAdapter(List<Playlist> d, OnClick c) { data = d; onClick = c; }
 
-        void submit(List<Playlist> d){
+        void submit(List<Playlist> d) {
             data = d != null ? d : new ArrayList<>();
             notifyDataSetChanged();
         }
 
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int v){
+        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int v) {
             View view = LayoutInflater.from(p.getContext()).inflate(R.layout.item_playlist_row, p, false);
             return new VH(view);
         }
 
-        @Override public void onBindViewHolder(@NonNull VH h, int pos){
+        @Override public void onBindViewHolder(@NonNull VH h, int pos) {
             Playlist pl = data.get(pos);
             h.title.setText(pl.name);
             h.itemView.setOnClickListener(v -> onClick.click(pl));
         }
 
-        @Override public int getItemCount(){ return data != null ? data.size() : 0; }
+        @Override public int getItemCount() { return data != null ? data.size() : 0; }
 
-        static class VH extends RecyclerView.ViewHolder{
+        static class VH extends RecyclerView.ViewHolder {
             TextView title;
-            VH(@NonNull View itemView){
+            VH(@NonNull View itemView) {
                 super(itemView);
                 title = itemView.findViewById(R.id.tv_playlist_name);
             }
