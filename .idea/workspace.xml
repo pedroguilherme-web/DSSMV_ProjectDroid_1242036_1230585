@@ -15,6 +15,11 @@
           <theme>@style/Theme.MyApplication</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_placeholder.xml">
+        <config>
+          <theme>@style/Theme.MyApplication</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/settings.xml">
         <config>
           <theme>@style/Theme.MyApplication</theme>
@@ -88,19 +93,37 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/repository/SpotifyRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/AddToPlaylistSheet.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/AddToPlaylistSheet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/ViewModel/PlaylistsViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/AddTracksResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/CreatePlaylistRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/Music.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/MusicAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/Playlist.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/PlaylistsResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/RemoveTracksRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/UserProfile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/auth/model/TokenManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/auth/model/TokenResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/auth/service/AuthTokenService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/spotify/SpotifyMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/spotify/SpotifyResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/spotify/SpotifyService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/Model/spotify/SpotifySession.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/AddToPlaylistSheet.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/PlaylistDetailsActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/PlaylistsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/View/PlaylistsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/ViewModel/MusicViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/data/auth/SessionProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/data/auth/SessionProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/ui/playlists/PlaylistsViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/Apoloplay/ui/playlists/PlaylistsViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/eye.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/eye.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=UOYPDIL7XG8DPBCA)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -311,7 +334,7 @@
       <workItem from="1762012434178" duration="753000" />
       <workItem from="1762013209843" duration="17651000" />
       <workItem from="1762422037244" duration="5136000" />
-      <workItem from="1762430690266" duration="51032000" />
+      <workItem from="1762430690266" duration="55437000" />
     </task>
     <servers />
   </component>

@@ -11,8 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.Apoloplay.R;
-import com.example.Apoloplay.ViewModel.MusicViewModel;
 import com.example.Apoloplay.data.ServiceLocator;
+import com.example.Apoloplay.ui.player.PlayerViewModel; // <— usa o VM novo
+
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -23,26 +24,44 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "7b7105fe7abf4c13911b13a910f79cff";
     private static final String REDIRECT_URI = "com.example.apoloplay://callback";
 
-    private MusicViewModel musicVM;
+    private PlayerViewModel playerVm; // <— VM novo
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_auth);
 
-        musicVM = new ViewModelProvider(this).get(MusicViewModel.class);
+        playerVm = new ViewModelProvider(this).get(PlayerViewModel.class);
 
-        ImageButton btnEye = findViewById(R.id.btn_open_playlists);
-        btnEye.setOnClickListener(v -> {
-            String token = ServiceLocator.sessionProvider().getUserAccessToken();
-            if (token == null || token.isEmpty()) {
-                Toast.makeText(this, "Inicia sessão no Spotify primeiro.", Toast.LENGTH_SHORT).show();
-                startSpotifyLogin();
-            } else {
-                musicVM.connectSpotifyAppRemote(this);
-                goToPlaylists();
-            }
-        });
+        ImageButton btnOpenPlaylists = findViewById(R.id.btn_open_playlists);
+        //ImageButton btnOpenSearch    = findViewById(R.id.btn_open_search);
+
+        btnOpenPlaylists.setOnClickListener(v -> ensureLoginThen(() -> {
+            playerVm.connect(this);     // App Remote via VM novo
+            goToPlaylists();
+        }));
+/*
+        if (btnOpenSearch != null) {
+            btnOpenSearch.setOnClickListener(v -> ensureLoginThen(() -> {
+                // Search usa token apenas para playlists (quando adicionas faixas),
+                // mas garantimos que o token já está no SessionProvider.
+                goToSearch();
+
+            }));
+
+
+        }
+         */
+    }
+
+    private void ensureLoginThen(Runnable afterLogin) {
+        String token = ServiceLocator.sessionProvider().getUserAccessToken();
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Inicia sessão no Spotify primeiro.", Toast.LENGTH_SHORT).show();
+            startSpotifyLogin();
+        } else {
+            afterLogin.run();
+        }
     }
 
     private void startSpotifyLogin() {
@@ -68,31 +87,28 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQ_CODE) {
             AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
-            switch (response.getType()) {
-                case TOKEN: {
-                    String accessToken = response.getAccessToken();
+            if (response.getType() == AuthorizationResponse.Type.TOKEN) {
+                String accessToken = response.getAccessToken();
 
-                    // === NOVO: guardar no provider partilhado da arquitetura nova ===
-                    ServiceLocator.sessionProvider().setUserAccessToken(accessToken);
+                // Guardar no provider partilhado usado pela arquitetura nova
+                ServiceLocator.sessionProvider().setUserAccessToken(accessToken);
 
-                    // App Remote (não precisa do token do Web API)
-                    musicVM.connectSpotifyAppRemote(this);
+                // Opcional: conecta já o App Remote para evitar esperar no primeiro click
+                playerVm.connect(this);
 
-                    Toast.makeText(this, "Login Spotify bem-sucedido!", Toast.LENGTH_SHORT).show();
-                    goToPlaylists();
-                    break;
-                }
-                case ERROR: {
-                    Toast.makeText(this, "Erro no login Spotify.", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                default:
-                    // cancelado → nada a fazer
+                Toast.makeText(this, "Sessão iniciada com sucesso.", Toast.LENGTH_SHORT).show();
+                goToPlaylists();
+            } else if (response.getType() == AuthorizationResponse.Type.ERROR) {
+                Toast.makeText(this, "Erro ao iniciar sessão: " + response.getError(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void goToPlaylists() {
         startActivity(new Intent(this, PlaylistsActivity.class));
+    }
+
+    private void goToSearch() {
+        startActivity(new Intent(this, SearchActivity.class));
     }
 }

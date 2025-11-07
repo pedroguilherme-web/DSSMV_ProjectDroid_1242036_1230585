@@ -26,7 +26,6 @@ public class PlaylistDetailsActivity extends AppCompatActivity {
     private PlaylistDetailsViewModel vm;
     private SwipeRefreshLayout swipe;
     private TracksAdapter adapter;
-
     private String playlistId;
     private String playlistName;
 

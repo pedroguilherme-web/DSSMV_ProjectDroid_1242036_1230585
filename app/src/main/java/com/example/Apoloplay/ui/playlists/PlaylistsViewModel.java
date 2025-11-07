@@ -122,7 +122,7 @@ public class PlaylistsViewModel extends ViewModel {
         });
     }
 
-    /** Remove 1 faixa (podes chamar no “roda dentada” dos detalhes). */
+
     public void removeTrackFromPlaylist(String playlistId, String trackUri, Runnable onDone) {
         PlaylistsUiState cur = state.getValue();
         List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();

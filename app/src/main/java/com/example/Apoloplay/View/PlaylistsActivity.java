@@ -1,3 +1,4 @@
+
 package com.example.Apoloplay.View;
 
 import android.content.Intent;
@@ -88,3 +89,6 @@ public class PlaylistsActivity extends AppCompatActivity {
         popup.show();
     }
 }
+
+
+
