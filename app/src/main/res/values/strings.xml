@@ -4,6 +4,8 @@
     <string name="pesquisar_hint">Pesquisar músicas…</string>
     <string name="music_cover_description">Capa do álbum da música.</string>
     <string name="definicoes">definições</string>
+    <string name="search">search</string>
+    <string name="search_songs_artists">search songs</string>
 
 
 </resources>
