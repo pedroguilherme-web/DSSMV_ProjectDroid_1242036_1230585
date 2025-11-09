@@ -74,13 +74,29 @@ public class PlaylistsRepositoryImpl implements PlaylistsRepository {
         });
     }
 
+    // --------- DUP CHECK + ADD ---------
     @Override
     public void addTrackToPlaylist(String playlistId, String singleTrackUri, SimpleCallback cb) {
-        api.addTracks(bearer(), playlistId, singleTrackUri).enqueue(new Callback<AddTracksResponseDTO>() {
-            @Override public void onResponse(Call<AddTracksResponseDTO> c, Response<AddTracksResponseDTO> r) {
-                if (r.isSuccessful()) cb.onSuccess(); else cb.onError("HTTP " + r.code());
+        // 1) Verificar se já existe (paginação 100/100)
+        checkTrackExists(playlistId, singleTrackUri, new ExistsCallback() {
+            @Override public void onResult(Boolean exists, String error) {
+                if (error != null) {
+                    cb.onError(error);
+                } else if (Boolean.TRUE.equals(exists)) {
+                    cb.onError("Erro-Duplicado");
+                } else {
+                    // 2) Não existe → adicionar
+                    api.addTracks(bearer(), playlistId, singleTrackUri)
+                            .enqueue(new Callback<AddTracksResponseDTO>() {
+                                @Override public void onResponse(Call<AddTracksResponseDTO> c, Response<AddTracksResponseDTO> r) {
+                                    if (r.isSuccessful()) cb.onSuccess(); else cb.onError("HTTP " + r.code());
+                                }
+                                @Override public void onFailure(Call<AddTracksResponseDTO> c, Throwable t) {
+                                    cb.onError(msg(t));
+                                }
+                            });
+                }
             }
-            @Override public void onFailure(Call<AddTracksResponseDTO> c, Throwable t) { cb.onError(msg(t)); }
         });
     }
 
@@ -94,7 +110,6 @@ public class PlaylistsRepositoryImpl implements PlaylistsRepository {
         });
     }
 
-    // NOVO:
     @Override
     public void deletePlaylist(String playlistId, SimpleCallback cb) {
         api.deletePlaylist(bearer(), playlistId).enqueue(new Callback<Void>() {
@@ -105,5 +120,56 @@ public class PlaylistsRepositoryImpl implements PlaylistsRepository {
         });
     }
 
-    private static String msg(Throwable t){ return (t!=null && t.getMessage()!=null) ? t.getMessage() : "Falha de rede"; }
+    // ---------- Helpers privados ----------
+
+    private interface ExistsCallback { void onResult(Boolean exists, String error); }
+
+    private void checkTrackExists(String playlistId, String targetUri, ExistsCallback cb) {
+        final int LIMIT = 100;
+        scanPage(playlistId, targetUri, 0, LIMIT, cb);
+    }
+
+    private void scanPage(String playlistId, String targetUri, int offset, int limit, ExistsCallback cb) {
+        api.getPlaylistTracks(bearer(), playlistId, limit, offset)
+                .enqueue(new Callback<PlaylistTracksResponseDTO>() {
+                    @Override public void onResponse(Call<PlaylistTracksResponseDTO> c, Response<PlaylistTracksResponseDTO> r) {
+                        if (!r.isSuccessful() || r.body()==null) {
+                            cb.onResult(null, "HTTP " + r.code());
+                            return;
+                        }
+                        PlaylistTracksResponseDTO body = r.body();
+
+                        boolean found = false;
+                        if (body.items != null) {
+                            for (var item : body.items) {
+                                if (item != null && item.track != null && item.track.uri != null) {
+                                    if (item.track.uri.equalsIgnoreCase(targetUri)) {
+                                        found = true; break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (found) {
+                            cb.onResult(true, null);
+                        } else {
+                            int pageCount = (body.items != null) ? body.items.size() : 0;
+                            if (pageCount < limit) {
+                                // última página → não existe
+                                cb.onResult(false, null);
+                            } else {
+                                // continuar a paginar
+                                scanPage(playlistId, targetUri, offset + limit, limit, cb);
+                            }
+                        }
+                    }
+                    @Override public void onFailure(Call<PlaylistTracksResponseDTO> c, Throwable t) {
+                        cb.onResult(null, msg(t));
+                    }
+                });
+    }
+
+    private static String msg(Throwable t){
+        return (t!=null && t.getMessage()!=null) ? t.getMessage() : "Falha de rede";
+    }
 }

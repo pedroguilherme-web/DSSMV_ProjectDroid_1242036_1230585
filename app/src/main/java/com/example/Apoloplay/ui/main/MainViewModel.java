@@ -41,7 +41,7 @@ public class MainViewModel extends ViewModel {
         return trending;
     }
 
-    /** Chama o repositório para obter as faixas em tendência (Top 50 Global). */
+    /** Chama o repositório para obter as faixas em tendência (Top 100 Global). */
     public void loadTrending() {
         repository.getTrending(trending::postValue);
     }
