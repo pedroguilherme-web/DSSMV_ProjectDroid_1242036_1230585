@@ -1,8 +1,8 @@
-
 package com.example.Apoloplay.View;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.Apoloplay.R;
 import com.example.Apoloplay.domain.model.Playlist;
+
 import com.example.Apoloplay.ui.playlists.PlaylistRowAdapter;
 import com.example.Apoloplay.ui.playlists.PlaylistsUiState;
 import com.example.Apoloplay.ui.playlists.PlaylistsViewModel;
@@ -43,16 +44,22 @@ public class PlaylistsActivity extends AppCompatActivity {
                 // tap → abre detalhes
                 pl -> {
                     Intent i = new Intent(this, PlaylistDetailsActivity.class);
-                    i.putExtra(EXTRA_PLAYLIST_ID, pl.id);
-                    i.putExtra(EXTRA_PLAYLIST_NAME, pl.name);
+                    i.putExtra(EXTRA_PLAYLIST_ID, pl.getId());
+                    i.putExtra(EXTRA_PLAYLIST_NAME, pl.getName());
                     startActivity(i);
                 },
-                // long-press → mostrar popup (este método está em baixo)
+                // long-press → mostrar popup
                 this::showPlaylistMenu
         );
         rv.setAdapter(adapter);
 
-        vm.getState().observe(this, this::render);
+        // observa o estado único (getState() é um atalho para uiState)
+
+
+        vm.uiState.observe(this, this::render);
+
+
+
         swipe.setOnRefreshListener(vm::refresh);
 
         FloatingActionButton fab = findViewById(R.id.fab_add);
@@ -64,22 +71,34 @@ public class PlaylistsActivity extends AppCompatActivity {
         vm.refresh(); // primeiro load
     }
 
+
     private void render(PlaylistsUiState s) {
-        swipe.setRefreshing(s.loading);
-        adapter.submit(s.items);
-        if (s.error != null) Toast.makeText(this, s.error, Toast.LENGTH_SHORT).show();
+        switch (s.getStatus()) {
+            case LOADING:
+                swipe.setRefreshing(true);
+                break;
+            case DATA:
+                swipe.setRefreshing(false);
+                adapter.submit(s.getData());
+                break;
+            case ERROR:
+                swipe.setRefreshing(false);
+                Toast.makeText(this, s.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
+
     // Recebe o anchor (View do item) + playlist, e mostra o menu
-    private void showPlaylistMenu(android.view.View anchor, Playlist pl) {
+    private void showPlaylistMenu(View anchor, Playlist pl) {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_playlist_row, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_delete_playlist) {
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Eliminar playlist")
-                        .setMessage("Queres eliminar \"" + pl.name + "\"?")
-                        .setPositiveButton("Eliminar", (d, w) -> vm.delete(pl.id))
+                        .setMessage("Queres eliminar \"" + pl.getName() + "\"?")
+                        .setPositiveButton("Eliminar", (d, w) -> vm.delete(pl.getId()))
                         .setNegativeButton("Cancelar", null)
                         .show();
                 return true;
@@ -89,6 +108,3 @@ public class PlaylistsActivity extends AppCompatActivity {
         popup.show();
     }
 }
-
-
-

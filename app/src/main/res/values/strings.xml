@@ -6,6 +6,15 @@
     <string name="definicoes">definições</string>
     <string name="search">search</string>
     <string name="search_songs_artists">search songs</string>
+    <!-- Erros amigáveis -->
+    <string name="error_duplicate">Erro-Duplicado</string>
+    <string name="error_session_expired">Sessão expirada. Inicia sessão novamente.</string>
+    <string name="error_forbidden">Sem permissões para esta ação.</string>
+    <string name="error_rate_limited">Muitos pedidos. Tenta mais tarde.</string>
+    <string name="error_server_unavailable">Servidor indisponível. Tenta novamente.</string>
+    <string name="error_network_failure">Falha de rede</string>
 
+    <!-- Mensagens gerais (se precisares) -->
+    <string name="loading">A carregar…</string>
 
 </resources>

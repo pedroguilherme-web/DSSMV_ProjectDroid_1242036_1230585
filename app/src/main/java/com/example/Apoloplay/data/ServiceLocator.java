@@ -1,4 +1,3 @@
-// com/example/Apoloplay/data/ServiceLocator.java
 package com.example.Apoloplay.data;
 
 import com.example.Apoloplay.data.auth.SpotifySessionProvider;
@@ -12,28 +11,21 @@ public final class ServiceLocator {
     private static SpotifySessionProvider sessionProvider;
     private static PlaylistsRepository playlistsRepository;
 
-    private ServiceLocator() {}
+    private ServiceLocator(){}
 
     public static SpotifyService spotifyService() {
-        if (spotifyService == null) {
-            spotifyService = RetrofitProvider.provideSpotifyService();
-        }
+        if (spotifyService == null) spotifyService = RetrofitProvider.provideSpotifyService();
         return spotifyService;
     }
 
     public static SpotifySessionProvider sessionProvider() {
-        if (sessionProvider == null) {
-            sessionProvider = new SpotifySessionProvider();
-        }
+        if (sessionProvider == null) sessionProvider = new SpotifySessionProvider();
         return sessionProvider;
     }
 
     public static PlaylistsRepository playlistsRepository() {
         if (playlistsRepository == null) {
-            playlistsRepository = new PlaylistsRepositoryImpl(
-                    spotifyService(),
-                    sessionProvider()   // repo lê sempre o token daqui
-            );
+            playlistsRepository = new PlaylistsRepositoryImpl(spotifyService(), sessionProvider());
         }
         return playlistsRepository;
     }

@@ -14,6 +14,12 @@ import com.example.Apoloplay.domain.model.Playlist;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter simples para o layout item_playlist_row.xml
+ * - Mostra nome e número de músicas
+ * - Clique curto → abre detalhes
+ * - Clique longo → abre menu contextual
+ */
 public class PlaylistRowAdapter extends RecyclerView.Adapter<PlaylistRowAdapter.VH> {
 
     public interface OnClick { void onClick(Playlist p); }
@@ -33,7 +39,8 @@ public class PlaylistRowAdapter extends RecyclerView.Adapter<PlaylistRowAdapter.
         notifyDataSetChanged();
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_playlist_row, parent, false);
@@ -43,19 +50,22 @@ public class PlaylistRowAdapter extends RecyclerView.Adapter<PlaylistRowAdapter.
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         Playlist pl = data.get(position);
-        h.title.setText(pl.name + " (" + pl.tracksTotal + ")");
+        h.title.setText(pl.getName() + " (" + pl.getTracksTotal() + ")");
 
         h.itemView.setOnClickListener(v -> {
             if (click != null) click.onClick(pl);
         });
 
         h.itemView.setOnLongClickListener(v -> {
-            if (longClick != null) longClick.onLongClick(v, pl); // <- CHAMA O POPUP
+            if (longClick != null) longClick.onLongClick(v, pl);
             return true;
         });
     }
 
-    @Override public int getItemCount() { return data.size(); }
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
         final TextView title;

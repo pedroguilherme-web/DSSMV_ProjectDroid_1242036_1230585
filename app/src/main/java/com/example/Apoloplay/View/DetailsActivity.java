@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.Apoloplay.R;
 import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.ui.addtoplaylist.AddToPlaylistSheet;
 import com.example.Apoloplay.ui.player.PlayerUiState;
 import com.example.Apoloplay.ui.player.PlayerViewModel;
 import com.example.Apoloplay.ui.playlistdetails.PlaylistDetailsViewModel;
@@ -74,7 +75,7 @@ public class DetailsActivity extends AppCompatActivity {
             playerVm.toggle(this, music);
         });
 
-        // Menu “…” (sem repetir)
+
         settingsBtn.setOnClickListener(this::showSettingsMenu);
     }
 
@@ -106,9 +107,10 @@ public class DetailsActivity extends AppCompatActivity {
 
             if (id == R.id.action_add_to_playlist) {
                 if (music != null && music.getSpotifyTrackUri() != null) {
-                    com.example.Apoloplay.ui.addtoplaylist.AddToPlaylistSheet
-                            .newInstance(music.getSpotifyTrackUri())
+                    AddToPlaylistSheet.newInstance(music.getSpotifyTrackUri())
                             .show(getSupportFragmentManager(), "AddToPlaylist");
+
+
                 } else {
                     Toast.makeText(this, "Sem track URI.", Toast.LENGTH_SHORT).show();
                 }

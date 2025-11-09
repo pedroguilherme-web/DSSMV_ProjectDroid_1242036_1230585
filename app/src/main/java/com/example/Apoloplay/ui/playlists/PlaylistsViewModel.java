@@ -3,140 +3,76 @@ package com.example.Apoloplay.ui.playlists;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import android.util.Log;
 
 import com.example.Apoloplay.data.ServiceLocator;
 import com.example.Apoloplay.domain.model.Playlist;
 import com.example.Apoloplay.domain.repository.PlaylistsRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-/**
- * ViewModel (arquitetura nova + domain repo):
- *  - expõe PlaylistsUiState (loading, items, error)
- *  - usa PlaylistsRepository (callbacks do domínio)
- *  - mantém sinais para o AddToPlaylistSheet (createdPlaylist / addTrackSuccess)
- */
 public class PlaylistsViewModel extends ViewModel {
 
-    private final PlaylistsRepository repo;
+    private static final String TAG = "PlaylistsVM";
+    private final PlaylistsRepository repository;
 
-    private final MutableLiveData<PlaylistsUiState> state =
-            new MutableLiveData<>(new PlaylistsUiState(false, Collections.emptyList(), null));
-    public LiveData<PlaylistsUiState> getState() { return state; }
+    // ÚNICO estado observado pela UI
+    private final MutableLiveData<PlaylistsUiState> _uiState =
+            new MutableLiveData<>(PlaylistsUiState.loading());
+    public final LiveData<PlaylistsUiState> uiState = _uiState;
 
-    // sinais auxiliares (BottomSheet)
-    private final MutableLiveData<Playlist> createdPlaylist = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> addTrackSuccess  = new MutableLiveData<>();
-    private final MutableLiveData<String>  errorBus         = new MutableLiveData<>();
+    // Eventos/sinais
+    private final MutableLiveData<Boolean> _addTrackSuccess = new MutableLiveData<>();
+    public final LiveData<Boolean> addTrackSuccess = _addTrackSuccess;
 
-    public LiveData<Playlist> getCreatedPlaylist() { return createdPlaylist; }
-    public LiveData<Boolean> getAddTrackSuccess()  { return addTrackSuccess; }
-    public LiveData<String>  getError()           { return errorBus; }
+    private final MutableLiveData<Playlist> _createdPlaylist = new MutableLiveData<>();
+    public final LiveData<Playlist> createdPlaylist = _createdPlaylist;
 
-    public PlaylistsViewModel() {
-        this(ServiceLocator.playlistsRepository());
-    }
+    public PlaylistsViewModel() { this(ServiceLocator.playlistsRepository()); }
+    public PlaylistsViewModel(PlaylistsRepository repository) { this.repository = repository; }
 
-    // visível para testes
-    PlaylistsViewModel(PlaylistsRepository repo) {
-        this.repo = repo;
-    }
+    public void loadMyPlaylists(int limit, int offset) {
+        _uiState.postValue(PlaylistsUiState.loading());
 
-    // ================= AÇÕES =================
-
-    /** Carrega / refresca as playlists do utilizador. */
-    public void refresh() {
-        PlaylistsUiState cur = state.getValue();
-        List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();
-        state.postValue(new PlaylistsUiState(true, keep, null));
-
-        repo.getMyPlaylists(50, 0, new PlaylistsRepository.PlaylistsCallback() {
-            @Override public void onSuccess(List<Playlist> items) {
-                state.postValue(new PlaylistsUiState(false, items, null));
+        repository.getMyPlaylists(limit, offset, new PlaylistsRepository.PlaylistsCallback() {
+            @Override public void onSuccess(List<Playlist> playlists) {
+                _uiState.postValue(PlaylistsUiState.data(playlists));
             }
             @Override public void onError(String message) {
-                state.postValue(new PlaylistsUiState(false, keep, message));
+                _uiState.postValue(PlaylistsUiState.error(message));
             }
         });
     }
 
-    /** Elimina uma playlist e atualiza imediatamente a lista local. */
+    public void refresh() { loadMyPlaylists(20, 0); }
+
+    public void createPlaylist(String name, String description, boolean isPublic) {
+        repository.createPlaylist(name, description, isPublic, new PlaylistsRepository.PlaylistCallback() {
+            @Override public void onSuccess(Playlist playlist) { _createdPlaylist.postValue(playlist); }
+            @Override public void onError(String message) { _uiState.postValue(PlaylistsUiState.error(message)); }
+        });
+    }
+
+    public void addTrack(String playlistId, String trackUri) {
+        repository.addTrackToPlaylist(playlistId, trackUri, new PlaylistsRepository.SimpleCallback() {
+            @Override public void onSuccess() { _addTrackSuccess.postValue(true); }
+            @Override public void onError(String message) {
+                _addTrackSuccess.postValue(false);
+                _uiState.postValue(PlaylistsUiState.error(message));
+            }
+        });
+    }
+
     public void delete(String playlistId) {
-        PlaylistsUiState cur = state.getValue();
-        List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();
-        state.postValue(new PlaylistsUiState(true, keep, null));
-
-        repo.deletePlaylist(playlistId, new PlaylistsRepository.SimpleCallback() {
-            @Override public void onSuccess() {
-                List<Playlist> updated = new ArrayList<>(keep);
-                for (int i = 0; i < updated.size(); i++) {
-                    if (playlistId.equals(updated.get(i).id)) {
-                        updated.remove(i);
-                        break;
-                    }
-                }
-                state.postValue(new PlaylistsUiState(false, updated, null));
-            }
-            @Override public void onError(String message) {
-                state.postValue(new PlaylistsUiState(false, keep, message));
-            }
+        repository.deletePlaylist(playlistId, new PlaylistsRepository.SimpleCallback() {
+            @Override public void onSuccess() { refresh(); }
+            @Override public void onError(String message) { _uiState.postValue(PlaylistsUiState.error(message)); }
         });
     }
 
-    /** Cria uma playlist (para o BottomSheet). */
-    public void createPlaylist(String name) {
-        PlaylistsUiState cur = state.getValue();
-        List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();
-        state.postValue(new PlaylistsUiState(true, keep, null));
-
-        repo.createPlaylist(name, "Criada via Apoloplay", false,
-                new PlaylistsRepository.PlaylistCallback() {
-                    @Override public void onSuccess(Playlist playlist) {
-                        state.postValue(new PlaylistsUiState(false, keep, null));
-                        createdPlaylist.postValue(playlist);
-                    }
-                    @Override public void onError(String message) {
-                        state.postValue(new PlaylistsUiState(false, keep, null));
-                        errorBus.postValue(message);
-                    }
-                });
-    }
-
-    /** Adiciona 1 faixa ("spotify:track:ID") à playlist. */
-    public void addTrackToPlaylist(String playlistId, String trackUri) {
-        PlaylistsUiState cur = state.getValue();
-        List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();
-        state.postValue(new PlaylistsUiState(true, keep, null));
-
-        repo.addTrackToPlaylist(playlistId, trackUri, new PlaylistsRepository.SimpleCallback() {
-            @Override public void onSuccess() {
-                state.postValue(new PlaylistsUiState(false, keep, null));
-                addTrackSuccess.postValue(true);
-            }
-            @Override public void onError(String message) {
-                state.postValue(new PlaylistsUiState(false, keep, null));
-                errorBus.postValue(message);
-            }
-        });
-    }
-
-
-    public void removeTrackFromPlaylist(String playlistId, String trackUri, Runnable onDone) {
-        PlaylistsUiState cur = state.getValue();
-        List<Playlist> keep = cur != null ? cur.items : Collections.emptyList();
-        state.postValue(new PlaylistsUiState(true, keep, null));
-
-        repo.removeTrackFromPlaylist(playlistId, trackUri, new PlaylistsRepository.SimpleCallback() {
-            @Override public void onSuccess() {
-                state.postValue(new PlaylistsUiState(false, keep, null));
-                if (onDone != null) onDone.run();
-            }
-            @Override public void onError(String message) {
-                state.postValue(new PlaylistsUiState(false, keep, message));
-                if (onDone != null) onDone.run();
-            }
-        });
+    @Override protected void onCleared() {
+        Log.d(TAG, "onCleared: cancelAll");
+        repository.cancelAll();
+        super.onCleared();
     }
 }

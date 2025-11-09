@@ -29,6 +29,7 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
 
     private static final String ARG_TRACK_URI = "arg_track_uri";
 
+    /** Factory (um argumento) — o teu DetailsActivity chama este. */
     public static AddToPlaylistSheet newInstance(String trackUri) {
         Bundle b = new Bundle();
         b.putString(ARG_TRACK_URI, trackUri);
@@ -55,7 +56,8 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
 
         adapter = new PlaylistsAdapter(new ArrayList<>(), playlist -> {
             if (playlist != null && trackUri != null) {
-                vm.addTrack(playlist.id, trackUri);
+                // ✅ modelos encapsulados
+                vm.addTrack(playlist.getId(), trackUri);
             }
         });
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -134,7 +136,8 @@ public class AddToPlaylistSheet extends BottomSheetDialogFragment {
         }
         @Override public void onBindViewHolder(@NonNull VH h, int pos){
             Playlist pl = data.get(pos);
-            h.title.setText(pl.name);
+            // ✅ getters (antes: pl.name)
+            h.title.setText(pl.getName());
             h.itemView.setOnClickListener(v -> onClick.click(pl));
         }
         @Override public int getItemCount(){ return data!=null ? data.size() : 0; }

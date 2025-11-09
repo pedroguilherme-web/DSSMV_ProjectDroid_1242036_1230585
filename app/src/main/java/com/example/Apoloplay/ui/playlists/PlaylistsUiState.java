@@ -1,22 +1,24 @@
 package com.example.Apoloplay.ui.playlists;
 
-import com.example.Apoloplay.domain.model.Playlist;
+import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import com.example.Apoloplay.domain.model.Playlist;
 
-public class PlaylistsUiState {
-    public final boolean loading;
-    public final List<Playlist> items;
-    public final String error;
+public final class PlaylistsUiState {
+    public enum Status { LOADING, DATA, ERROR }
+    private final Status status;
+    private final List<Playlist> data;
+    private final String errorMessage;
 
-    public PlaylistsUiState(boolean loading, List<Playlist> items, String error) {
-        this.loading = loading;
-        this.items = items != null ? items : Collections.emptyList();
-        this.error = error;
+    private PlaylistsUiState(Status s, @Nullable List<Playlist> d, @Nullable String e) {
+        this.status = s; this.data = d==null?null: Collections.unmodifiableList(d); this.errorMessage = e;
     }
+    public static PlaylistsUiState loading() { return new PlaylistsUiState(Status.LOADING, null, null); }
+    public static PlaylistsUiState data(List<Playlist> d) { return new PlaylistsUiState(Status.DATA, d, null); }
+    public static PlaylistsUiState error(String e) { return new PlaylistsUiState(Status.ERROR, null, e); }
 
-    public static PlaylistsUiState idle(){ return new PlaylistsUiState(false, Collections.emptyList(), null); }
-    public static PlaylistsUiState loading(){ return new PlaylistsUiState(true, Collections.emptyList(), null); }
-    public static PlaylistsUiState success(List<Playlist> data){ return new PlaylistsUiState(false, data, null); }
-    public static PlaylistsUiState error(String msg){ return new PlaylistsUiState(false, Collections.emptyList(), msg); }
+    public Status getStatus() { return status; }
+    public List<Playlist> getData() { return data; }
+    public String getErrorMessage() { return errorMessage; }
 }

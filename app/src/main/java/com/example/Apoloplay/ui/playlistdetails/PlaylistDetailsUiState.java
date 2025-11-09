@@ -1,22 +1,42 @@
 package com.example.Apoloplay.ui.playlistdetails;
 
+import androidx.annotation.Nullable;
+
 import com.example.Apoloplay.domain.model.Music;
+
 import java.util.Collections;
 import java.util.List;
 
-public class PlaylistDetailsUiState {
-    public final boolean loading;
-    public final List<Music> tracks;
-    public final String error;
+/** Estado único para o ecrã de detalhes da playlist (loading / data / error). */
+public final class PlaylistDetailsUiState {
 
-    public PlaylistDetailsUiState(boolean loading, List<Music> tracks, String error) {
-        this.loading = loading;
-        this.tracks = tracks != null ? tracks : Collections.emptyList();
-        this.error = error;
+    public enum Status { LOADING, DATA, ERROR }
+
+    private final Status status;
+    private final List<Music> tracks;
+    private final String errorMessage;
+
+    private PlaylistDetailsUiState(Status status, @Nullable List<Music> tracks, @Nullable String errorMessage) {
+        this.status = status;
+        this.tracks = tracks == null ? Collections.emptyList() : Collections.unmodifiableList(tracks);
+        this.errorMessage = errorMessage;
     }
 
-    public static PlaylistDetailsUiState idle(){ return new PlaylistDetailsUiState(false, Collections.emptyList(), null); }
-    public static PlaylistDetailsUiState loading(){ return new PlaylistDetailsUiState(true, Collections.emptyList(), null); }
-    public static PlaylistDetailsUiState success(List<Music> data){ return new PlaylistDetailsUiState(false, data, null); }
-    public static PlaylistDetailsUiState error(String msg){ return new PlaylistDetailsUiState(false, Collections.emptyList(), msg); }
+    // Fábricas
+    public static PlaylistDetailsUiState loading() {
+        return new PlaylistDetailsUiState(Status.LOADING, null, null);
+    }
+
+    public static PlaylistDetailsUiState data(List<Music> tracks) {
+        return new PlaylistDetailsUiState(Status.DATA, tracks, null);
+    }
+
+    public static PlaylistDetailsUiState error(String message) {
+        return new PlaylistDetailsUiState(Status.ERROR, null, message);
+    }
+
+    // Getters
+    public Status getStatus() { return status; }
+    public List<Music> getTracks() { return tracks; }
+    public String getErrorMessage() { return errorMessage; }
 }
