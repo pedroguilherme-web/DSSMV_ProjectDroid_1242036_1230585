@@ -40,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "com.example.apoloplay://callback";
     public static final String EXTRA_INITIAL_QUERY = "EXTRA_INITIAL_QUERY";
 
-    // 🎚️ Auto-scroll config
-    private static final int TICK_MS = 16;          // ~60fps
-    private static final int STEP_PX = 4;           // velocidade por frame
-    private static final int PAUSE_MS = 1000;        // ⏸️ pausa quando o card está no centro (0 = sem pausa)
-    private static final int SYNC_TICKS = 25;       // quantos ticks até sincronizar índice (~400ms)
-    private static final int CENTER_TOLERANCE_PX = 6; // quão perto do centro tem de estar p/ pausar
+    // 🎚️ Auto-scroll config (podes afinar aqui)
+    private static final int TICK_MS = 16;              // ~60fps
+    private static final int STEP_PX = 4;               // velocidade por frame (aumenta para rolar mais rápido)
+    private static final int PAUSE_MS = 1000;           // pausa quando um card fica centrado
+    private static final int SYNC_TICKS = 25;           // sincroniza índice lógico periodicamente (~400ms)
+    private static final int CENTER_TOLERANCE_PX = 6;   // quão perto do centro para “considerar centrado”
 
     // VMs
     private PlayerViewModel playerVm;
@@ -69,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean autoRunning = false;
     private boolean userInteracting = false;
     private int tickCounter = 0;
-    private Integer lastPausedCenterPos = null; // evita pausar várias vezes no mesmo card
+    private Integer lastPausedCenterPos = null;
+    private Integer lastAppliedIndex = null;
 
     private Runnable pendingAfterLogin;
 
@@ -99,9 +100,9 @@ public class MainActivity extends AppCompatActivity {
         rvTrending.setAdapter(adapter);
 
         snap = new PagerSnapHelper();
-        attachSnap(); // ligado para interação manual
+        attachSnap(); // ligado enquanto o utilizador interage manualmente
 
-        // Listener de scroll → sincroniza índice lógico quando snap está ativo
+        // Sincroniza índice lógico quando o scroll para e o snap está ativo
         rvTrending.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrollStateChanged(RecyclerView rv, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && snapAttached) {
@@ -110,14 +111,16 @@ public class MainActivity extends AppCompatActivity {
                     if (s != null && n > 0) {
                         int pos = rvTrending.getChildAdapterPosition(s);
                         if (pos != RecyclerView.NO_POSITION) {
-                            carouselVm.setIndex(pos % n);
+                            int idx = pos % n;
+                            carouselVm.setIndex(idx);
+                            lastAppliedIndex = idx; // fica alinhado com o que se vê
                         }
                     }
                 }
             }
         });
 
-        // Toque → pausa motor & liga snap para o utilizador arrastar
+        // Toque do utilizador → pausa motor & liga snap; ao soltar → desliga snap e retoma motor
         rvTrending.setOnTouchListener((v, e) -> {
             int a = e.getActionMasked();
             if (a == MotionEvent.ACTION_DOWN) {
@@ -126,29 +129,37 @@ public class MainActivity extends AppCompatActivity {
                 attachSnap();
             } else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
                 userInteracting = false;
-                // dá tempo ao snap de assentar e a possíveis cliques
                 rvTrending.postDelayed(() -> {
                     detachSnap();
-                    // limpar último card pausado para permitir pausar no card atual
-                    lastPausedCenterPos = null;
+                    lastPausedCenterPos = null; // permite pausar no próximo centrado
                     startAutoIfOk();
                 }, 450);
             }
             return false;
         });
 
-        // Dados
+        // Dados (quando a lista muda)
         mainVm.getTrending().observe(this, list -> {
             adapter.submit(list);
             carouselVm.bindList(list);
             if (list != null && !list.isEmpty()) {
-                Integer idx = carouselVm.getCurrentIndex().getValue();
-                if (idx == null) idx = 0;
-                final int anchor = anchorOf(idx);
-                rvTrending.post(() -> lm.scrollToPosition(anchor));
+                // só posiciona no arranque (evita “saltos” quando já está estável)
+                if (lastAppliedIndex == null) {
+                    int idx = 0;
+                    com.example.Apoloplay.ui.trending.CarouselUiState st = carouselVm.getState().getValue();
+                    if (st != null) idx = st.getCurrentIndex();
+
+                    final int anchor = anchorOf(idx);
+                    rvTrending.post(() -> lm.scrollToPosition(anchor));
+                    lastAppliedIndex = idx;
+                }
                 detachSnap();
                 lastPausedCenterPos = null;
                 startAutoIfOk();
+            } else {
+                // lista vazia → para motor
+                stopAuto();
+                lastAppliedIndex = null;
             }
         });
 
@@ -190,10 +201,16 @@ public class MainActivity extends AppCompatActivity {
             if (cur == null || cur.isEmpty()) {
                 mainVm.loadTrending();
             } else {
-                Integer idx = carouselVm.getCurrentIndex().getValue();
-                if (idx == null) idx = 0;
-                final int anchor = anchorOf(idx);
-                rvTrending.post(() -> lm.scrollToPosition(anchor));
+                if (lastAppliedIndex == null) {
+
+                    int idx = 0;
+                    com.example.Apoloplay.ui.trending.CarouselUiState st = carouselVm.getState().getValue();
+                    if (st != null) idx = st.getCurrentIndex();
+
+                    final int anchor = anchorOf(idx);
+                    rvTrending.post(() -> lm.scrollToPosition(anchor));
+                    lastAppliedIndex = idx;
+                }
                 detachSnap();
                 lastPausedCenterPos = null;
                 startAutoIfOk();
@@ -218,16 +235,20 @@ public class MainActivity extends AppCompatActivity {
             if (!autoRunning || adapter.getItemCount() == 0) return;
             if (userInteracting) { scheduleNext(TICK_MS); return; }
 
-            // scroll contínuo por px
+            // scroll contínuo por px (animação “suave” frame a frame)
             rvTrending.scrollBy(STEP_PX, 0);
             tickCounter++;
 
-            // sincroniza índice lógico periodicamente
+            // sincroniza índice lógico periodicamente (para Details abrir o item certo)
             if (tickCounter % SYNC_TICKS == 0) {
                 int n = adapter.logicalSize();
                 if (n > 0) {
                     int pos = lm.findFirstVisibleItemPosition();
-                    if (pos >= 0) carouselVm.setIndex(pos % n);
+                    if (pos >= 0) {
+                        int idx = pos % n;
+                        carouselVm.setIndex(idx);
+                        lastAppliedIndex = idx;
+                    }
                 }
             }
 
@@ -236,10 +257,16 @@ public class MainActivity extends AppCompatActivity {
                 int centeredPos = getCenteredAdapterPosition();
                 if (centeredPos != -1 && !centeredPosEqualsLast(centeredPos)) {
                     lastPausedCenterPos = centeredPos;
+
                     int n = adapter.logicalSize();
-                    if (n > 0) carouselVm.setIndex(centeredPos % n);
-                    scheduleNext(PAUSE_MS); // respira no centro
-                    return; // não agendar tick normal agora
+                    if (n > 0) {
+                        int idx = centeredPos % n;
+                        carouselVm.setIndex(idx);
+                        lastAppliedIndex = idx;
+                    }
+
+                    scheduleNext(PAUSE_MS); // respira 1s no centro
+                    return; // não agendas o tick normal agora
                 }
             }
 
@@ -249,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private boolean centeredPosEqualsLast(int centeredPos) {
-        // Evita pausar múltiplas vezes no mesmo card enquanto continua centrado
+        // Evita pausar várias vezes no mesmo card enquanto continua centrado
         return lastPausedCenterPos != null && lastPausedCenterPos == centeredPos;
     }
 

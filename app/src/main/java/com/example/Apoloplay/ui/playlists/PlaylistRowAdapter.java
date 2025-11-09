@@ -50,7 +50,7 @@ public class PlaylistRowAdapter extends RecyclerView.Adapter<PlaylistRowAdapter.
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         Playlist pl = data.get(position);
-        h.title.setText(pl.getName() + " (" + pl.getTracksTotal() + ")");
+        h.title.setText(pl.getName() );
 
         h.itemView.setOnClickListener(v -> {
             if (click != null) click.onClick(pl);

@@ -18,13 +18,17 @@ public class SearchViewModel extends ViewModel {
     public LiveData<SearchUiState> getState(){ return state; }
 
     public void search(String query){
+        if (query == null || query.trim().isEmpty()) {
+            state.postValue(SearchUiState.idle());
+            return;
+        }
         state.postValue(SearchUiState.loading());
-        repo.searchTracks(query, new SearchRepository.Callback() {
+        repo.searchTracks(query.trim(), new SearchRepository.Callback() {
             @Override public void onSuccess(List<Music> data) {
-                state.postValue(SearchUiState.success(data));
+                state.postValue(SearchUiState.data(data));   // <= enum version usa data(...)
             }
             @Override public void onError(String message) {
-                state.postValue(SearchUiState.error(message!=null?message:"Erro inesperado"));
+                state.postValue(SearchUiState.error(message != null ? message : "Erro inesperado"));
             }
         });
     }

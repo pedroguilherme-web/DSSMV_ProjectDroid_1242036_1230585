@@ -1,4 +1,3 @@
-// com/example/Apoloplay/ui/trending/CarouselViewModel.java
 package com.example.Apoloplay.ui.trending;
 
 import android.os.Handler;
@@ -11,53 +10,66 @@ import com.example.Apoloplay.domain.model.Music;
 
 import java.util.List;
 
-/** VM guarda estado do carrossel (índice + timer de auto-scroll). */
+
 public class CarouselViewModel extends ViewModel {
 
-    private final MutableLiveData<Integer> currentIndex = new MutableLiveData<>(0);
-    private final MutableLiveData<Boolean> isAuto = new MutableLiveData<>(false);
-
-    private final Handler handler = new Handler();
-    private final int intervalMs = 2500;
+    private final MutableLiveData<CarouselUiState> _state =
+            new MutableLiveData<>(CarouselUiState.empty());
+    public LiveData<CarouselUiState> getState() { return _state; }
 
     private List<Music> cached;
+    private final Handler handler = new Handler();
+    private static final int INTERVAL_MS = 2500;
 
     private final Runnable tick = new Runnable() {
         @Override public void run() {
-            if (cached == null || cached.isEmpty()) return;
-            if (!Boolean.TRUE.equals(isAuto.getValue())) return;
+            CarouselUiState s = _state.getValue();
+            if (s == null || cached == null || cached.isEmpty()) return;
+            if (!s.isAuto()) return;
 
-            Integer cur = currentIndex.getValue();
-            int next = ((cur != null ? cur : 0) + 1) % cached.size();
-            currentIndex.setValue(next);
-            handler.postDelayed(this, intervalMs);
+            int next = (s.getCurrentIndex() + 1) % cached.size();
+            _state.setValue(CarouselUiState.of(cached, next, true));
+            handler.postDelayed(this, INTERVAL_MS);
         }
     };
 
-    public LiveData<Integer> getCurrentIndex() { return currentIndex; }
-    public LiveData<Boolean> getIsAuto() { return isAuto; }
-
+    /** Liga/atualiza a lista (vinda do MainViewModel). */
     public void bindList(List<Music> list) {
         cached = list;
-        if (cached == null || cached.isEmpty()) stopAuto();
+        CarouselUiState cur = _state.getValue();
+        int idx   = (cur != null) ? cur.getCurrentIndex() : 0;
+        boolean a = (cur != null) && cur.isAuto();
+
+        if (cached == null || cached.isEmpty()) {
+            stopAuto();
+            _state.setValue(CarouselUiState.empty());
+        } else {
+            if (idx >= cached.size()) idx = 0;
+            _state.setValue(CarouselUiState.of(cached, idx, a));
+        }
     }
 
     public void setIndex(int idx) {
         if (cached == null || cached.isEmpty()) return;
         if (idx < 0) idx = 0;
         if (idx >= cached.size()) idx = cached.size() - 1;
-        currentIndex.setValue(idx);
+        CarouselUiState cur = _state.getValue();
+        boolean a = (cur != null) && cur.isAuto();
+        _state.setValue(CarouselUiState.of(cached, idx, a));
     }
 
     public void startAuto() {
         if (cached == null || cached.isEmpty()) return;
-        if (Boolean.TRUE.equals(isAuto.getValue())) return;
-        isAuto.setValue(true);
-        handler.postDelayed(tick, intervalMs);
+        CarouselUiState cur = _state.getValue();
+        if (cur != null && cur.isAuto()) return;
+        int idx = (cur != null) ? cur.getCurrentIndex() : 0;
+        _state.setValue(CarouselUiState.of(cached, idx, true));
+        handler.postDelayed(tick, INTERVAL_MS);
     }
 
     public void stopAuto() {
-        isAuto.setValue(false);
+        CarouselUiState cur = _state.getValue();
+        if (cur != null) _state.setValue(CarouselUiState.of(cur.getItems(), cur.getCurrentIndex(), false));
         handler.removeCallbacks(tick);
     }
 

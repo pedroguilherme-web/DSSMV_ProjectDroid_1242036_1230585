@@ -98,7 +98,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="@string/definicoes"
-            android:background="?attr/selectableItemBackgroundBorderless"
+
+            android:background="#FFFFFFFF"
             android:tint="@android:color/black"
             app:srcCompat="@drawable/settings"
             app:layout_constraintTop_toTopOf="parent"

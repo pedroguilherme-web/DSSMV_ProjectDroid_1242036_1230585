@@ -1,4 +1,3 @@
-// com/example/Apoloplay/View/SearchActivity.java
 package com.example.Apoloplay.View;
 
 import android.content.Intent;
@@ -43,7 +42,6 @@ public class SearchActivity extends AppCompatActivity {
         RecyclerView rv = findViewById(R.id.recyclerView);
         searchInput = findViewById(R.id.searchInput);
 
-        // Teu adapter original (1 callback → abrir detalhes)
         adapter = new SearchRowAdapter(this::openDetails);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter);
@@ -75,19 +73,36 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // ✅ Garantir token assim que entras neste ecrã (sem tocar na tua lógica do sheet)
         ensureLoggedIn();
     }
 
-    // --- UI render ---
+    // --- UI render com enum + switch ---
     private void render(SearchUiState s) {
-        adapter.submit(s.items);
-        if (s.error != null) {
-            Toast.makeText(this, s.error, Toast.LENGTH_SHORT).show();
+        switch (s.getStatus()) {
+            case IDLE:
+
+                adapter.submit(java.util.Collections.emptyList());
+                break;
+
+            case LOADING:
+
+                break;
+
+            case DATA:
+                adapter.submit(s.getResults());
+
+                break;
+
+            case ERROR:
+                adapter.submit(java.util.Collections.emptyList());
+                if (s.getError() != null) {
+                    Toast.makeText(this, s.getError(), Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
-    // --- Navegação (igual ao teu) ---
+    // --- Navegação ---
     private void openDetails(Music m) {
         Intent i = new Intent(this, DetailsActivity.class);
         i.putExtra("MUSIC_DETAILS", m);
@@ -126,7 +141,6 @@ public class SearchActivity extends AppCompatActivity {
         if (requestCode == REQ_CODE_SPOTIFY) {
             AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthorizationResponse.Type.TOKEN) {
-                // ✅ guardar token partilhado para os repositórios/sheets
                 ServiceLocator.sessionProvider().setUserAccessToken(response.getAccessToken());
             } else if (response.getType() == AuthorizationResponse.Type.ERROR) {
                 Toast.makeText(this, "Erro ao iniciar sessão: " + response.getError(), Toast.LENGTH_SHORT).show();
