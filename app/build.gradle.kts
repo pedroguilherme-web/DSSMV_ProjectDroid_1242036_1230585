@@ -52,8 +52,6 @@ android {
             )
         }
     }
-
-    // ✅ isto estava dentro do packaging — agora está no sítio certo
     lint {
         abortOnError = false
     }
@@ -65,7 +63,7 @@ android {
 
 dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    // --- Dependência do Desugar adicionada corretamente ---
+    // --- Dependência do Desugar ---
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.0")
 
     implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
@@ -78,7 +76,7 @@ dependencies {
     // Networking e Imagens
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.picasso:picasso:2.71828") // Note: A versão 2.8 é mais recente
+    implementation("com.squareup.picasso:picasso:2.71828")
 
     // AndroidX e UI
     implementation("androidx.recyclerview:recyclerview:1.3.2")
@@ -91,6 +89,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    //  OkHttp Logging Interceptor (útil para depuração)
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
     }
 
 

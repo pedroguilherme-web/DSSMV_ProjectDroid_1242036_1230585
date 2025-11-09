@@ -6,7 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <!-- Botão “olho” para abrir playlists -->
     <ImageButton
             android:id="@+id/btn_open_playlists"
             android:layout_width="100dp"
@@ -21,11 +20,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-
-
-
-    <!-- Carrossel de músicas em tendência -->
+    <ImageButton
+            android:id="@+id/btn_shazam"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/circulo_shazam"
+            android:src="@drawable/ic_mic_white"
+            android:contentDescription="Reconhecimento de música"
+            app:tint="@android:color/white"
+            android:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/search_bar_container" />
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_trending"
             android:layout_width="match_parent"
@@ -41,17 +48,6 @@
             android:paddingEnd="20dp"
             android:overScrollMode="never"/>
 
-
-
-
-
-
-
-
-
-
-
-    <!-- Barra de pesquisa com pílula + ícone -->
     <LinearLayout
             android:id="@+id/search_bar_container"
             android:layout_width="0dp"
