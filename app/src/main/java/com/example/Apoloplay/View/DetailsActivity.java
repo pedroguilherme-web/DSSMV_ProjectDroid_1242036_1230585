@@ -1,4 +1,3 @@
-// com/example/Apoloplay/View/DetailsActivity.java
 package com.example.Apoloplay.View;
 
 import android.os.Bundle;
@@ -22,7 +21,7 @@ import com.squareup.picasso.Picasso;
 public class DetailsActivity extends AppCompatActivity {
 
     private PlayerViewModel playerVm;
-    private PlaylistDetailsViewModel playlistVm; // <-- PRECISAS DISTO
+    private PlaylistDetailsViewModel playlistVm;
     private Music music;
 
     private Button playPauseButton;
@@ -48,7 +47,7 @@ public class DetailsActivity extends AppCompatActivity {
         TextView rel   = findViewById(R.id.detail_music_release_date);
 
         playerVm   = new ViewModelProvider(this).get(PlayerViewModel.class);
-        playlistVm = new ViewModelProvider(this).get(PlaylistDetailsViewModel.class); // <-- AQUI
+        playlistVm = new ViewModelProvider(this).get(PlaylistDetailsViewModel.class);
 
         music = (Music) getIntent().getSerializableExtra("MUSIC_DETAILS");
         openedFromPlaylistId = getIntent().getStringExtra(EXTRA_FROM_PLAYLIST_ID);
@@ -63,8 +62,19 @@ public class DetailsActivity extends AppCompatActivity {
             rel.setText("Lançamento: " + (music.getReleaseDate() != null ? music.getReleaseDate() : "N/D"));
         }
 
+        // Estado do player
         playerVm.getState().observe(this, this::renderState);
-        playPauseButton.setOnClickListener(v -> { if (music != null) playerVm.playOrToggle(this, music); });
+
+        // Botão principal: toggle simples
+        playPauseButton.setOnClickListener(v -> {
+            if (music == null) {
+                Toast.makeText(this, "Sem faixa selecionada.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            playerVm.toggle(this, music);
+        });
+
+        // Menu “…” (sem repetir)
         settingsBtn.setOnClickListener(this::showSettingsMenu);
     }
 
@@ -85,10 +95,7 @@ public class DetailsActivity extends AppCompatActivity {
                 new androidx.appcompat.widget.PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_detail_settings, popup.getMenu());
 
-        PlayerUiState cur = playerVm.getState().getValue();
-        boolean loop = cur != null && cur.loopOne;
-        popup.getMenu().findItem(R.id.action_repeat_one).setChecked(loop);
-
+        // Só mostra “remover da playlist” se vieste de uma playlist
         if (popup.getMenu().findItem(R.id.action_remove_from_playlist) != null) {
             popup.getMenu().findItem(R.id.action_remove_from_playlist)
                     .setVisible(openedFromPlaylistId != null);
@@ -96,13 +103,8 @@ public class DetailsActivity extends AppCompatActivity {
 
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.action_repeat_one) {
-                boolean enable = !item.isChecked();
-                item.setChecked(enable);
-                playerVm.setRepeatOne(enable);
-                return true;
 
-            } else if (id == R.id.action_add_to_playlist) {
+            if (id == R.id.action_add_to_playlist) {
                 if (music != null && music.getSpotifyTrackUri() != null) {
                     com.example.Apoloplay.ui.addtoplaylist.AddToPlaylistSheet
                             .newInstance(music.getSpotifyTrackUri())

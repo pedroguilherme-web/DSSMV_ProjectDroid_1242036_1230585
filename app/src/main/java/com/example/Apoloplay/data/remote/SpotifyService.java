@@ -1,11 +1,6 @@
 package com.example.Apoloplay.data.remote;
 
-import com.example.Apoloplay.data.remote.dto.AddTracksResponseDTO;
-import com.example.Apoloplay.data.remote.dto.CreatePlaylistRequest;
-import com.example.Apoloplay.data.remote.dto.PlaylistDTO;
-import com.example.Apoloplay.data.remote.dto.PlaylistTracksResponseDTO;
-import com.example.Apoloplay.data.remote.dto.PlaylistsResponseDTO;
-import com.example.Apoloplay.data.remote.dto.RemoveTracksRequest;
+import com.example.Apoloplay.data.remote.dto.*;
 
 import com.example.Apoloplay.data.remote.dto.search.SpotifySearchResponseDTO;
 import retrofit2.Call;
@@ -67,6 +62,9 @@ public interface SpotifyService {
             @Query("type") String type,
             @Query("limit") int limit
     );
+
+
+
 
     // DTO mínimo do /me
     class UserProfileDTO {
