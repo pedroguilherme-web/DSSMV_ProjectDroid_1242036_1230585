@@ -1,10 +1,15 @@
 package com.example.Apoloplay.View;
 
 import android.media.MediaRecorder;
+import android.os.Build;
+import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 
 public class AudioRecorder {
+
+    private static final String TAG = "Shazam-Recorder";
 
     private MediaRecorder recorder;
     private final File outputFile;
@@ -15,42 +20,70 @@ public class AudioRecorder {
     }
 
     public void startRecording() {
-        if (isRecording) {
-            return;
-        }
+        if (isRecording) return;
 
         recorder = new MediaRecorder();
-
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recorder.setOutputFile(outputFile.getAbsolutePath());
-
         try {
+            // --- Fonte de áudio ---
+            // usa UNPROCESSED (Android 7+) ou VOICE_RECOGNITION para evitar filtros (AGC/NS)
+            int source = MediaRecorder.AudioSource.MIC;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                source = MediaRecorder.AudioSource.UNPROCESSED;
+            } else {
+                source = MediaRecorder.AudioSource.VOICE_RECOGNITION;
+            }
+            recorder.setAudioSource(source);
+
+            // --- Formato e codec ---
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            recorder.setAudioSamplingRate(44100);
+            recorder.setAudioEncodingBitRate(128_000); // 128 kbps é ideal
+            recorder.setAudioChannels(1);              // mono: melhor fingerprint
+
+            recorder.setOutputFile(outputFile.getAbsolutePath());
+
             recorder.prepare();
             recorder.start();
             isRecording = true;
+
+            Log.d(TAG, "Recording started -> " + outputFile.getAbsolutePath());
         } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
+            Log.e(TAG, "startRecording failed", e);
+            safeCleanup(true);
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected recorder error", e);
+            safeCleanup(true);
         }
     }
 
     public void stopRecording() {
-        if (!isRecording) {
-            return;
-        }
+        if (!isRecording || recorder == null) return;
 
         try {
             recorder.stop();
-            recorder.release();
+            Log.d(TAG, "Recording stopped.");
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (outputFile.exists()) {
-                outputFile.delete();
-            }
+            Log.e(TAG, "stopRecording runtime error", e);
+            safeCleanup(true);
+            return;
         } finally {
-            recorder = null;
-            isRecording = false;
+            safeCleanup(false);
+        }
+    }
+
+    private void safeCleanup(boolean deleteFile) {
+        try {
+            if (recorder != null) {
+                recorder.reset();
+                recorder.release();
+            }
+        } catch (Exception ignored) {}
+        recorder = null;
+        isRecording = false;
+        if (deleteFile && outputFile.exists()) {
+            boolean deleted = outputFile.delete();
+            Log.d(TAG, "Deleted invalid audio file: " + deleted);
         }
     }
 

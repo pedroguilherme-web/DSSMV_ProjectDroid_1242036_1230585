@@ -1,5 +1,6 @@
 package com.example.Apoloplay.data;
 
+import com.example.Apoloplay.data.remote.ShazamApiService;
 import com.example.Apoloplay.data.remote.SpotifyService;
 import com.example.Apoloplay.utils.Constants;
 import retrofit2.Retrofit;
@@ -40,7 +41,9 @@ public class RetrofitProvider {
         return apiRetrofit;
     }
 
-    // Retrofit para a API do Shazam (RapidAPI)
+
+
+
     public static Retrofit provideShazamRetrofit() {
         if (shazamRetrofit == null) {
             shazamRetrofit = new Retrofit.Builder()
@@ -50,6 +53,16 @@ public class RetrofitProvider {
         }
         return shazamRetrofit;
     }
+    public static ShazamApiService provideShazamService() {
+        return provideShazamRetrofit().create(ShazamApiService.class);
+    }
+
+
+
+
+
+
+
 
     // Serviço padrão (API principal)
     public static SpotifyService provideSpotifyService() {
