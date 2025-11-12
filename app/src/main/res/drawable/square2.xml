@@ -1,0 +1,6 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+    <!-- usa a mesma cor que estavas a usar no mic; ajusta aqui se o teu circle_shazam tiver outro tom -->
+    <solid android:color="#2563EB"/>
+    <corners android:radius="12dp"/>
+</shape>
