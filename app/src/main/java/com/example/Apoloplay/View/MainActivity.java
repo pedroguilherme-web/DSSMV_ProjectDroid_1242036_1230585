@@ -171,17 +171,22 @@ public class MainActivity extends AppCompatActivity {
         switch (state.getStatus()) {
             case RECORDING: toastOnce("A gravar áudio…"); break;
             case LOADING:   toastOnce("A reconhecer…");   break;
-            case DATA:
+            case DATA: {
                 Music m = state.getMusic();
-                toastOnce(m != null ? "Música: " + m.getTitle() + " · " + m.getArtist()
-                        : "Música não reconhecida.");
+                if (m != null) {
+                    DetailsActivity.start(this, m, "shazam");
+                } else {
+                    toastOnce("Música não reconhecida.");
+                }
                 break;
+            }
             case ERROR:
                 toastOnce("Erro: " + (state.getError() != null ? state.getError() : "desconhecido"));
                 break;
-            default: break; // IDLE
+            default: break;
         }
     }
+
 
     // Spotify Auth
     private void ensureLoginThen(Runnable afterLogin) {
