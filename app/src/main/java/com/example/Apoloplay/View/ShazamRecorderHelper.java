@@ -1,9 +1,7 @@
 package com.example.Apoloplay.View;
 
-import android.content.Context;
 import android.os.Handler;
-import android.widget.ImageButton;
-import android.widget.Toast;
+import android.os.Looper;
 
 import java.io.File;
 
@@ -12,21 +10,18 @@ public class ShazamRecorderHelper {
     public interface Callbacks {
         void onRecordingStarted();
         void onRecordingFinished(File fileOrNull);
+        default void onError(Exception e) {} // opcional
     }
 
-    private final Context ctx;
-    private final ImageButton button;
     private final File outputFile;
     private final int recordMs;
     private final Callbacks callbacks;
 
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private AudioRecorder recorder;
     private boolean busy = false;
 
-    public ShazamRecorderHelper(Context ctx, ImageButton button, File outputFile, int recordMs, Callbacks cb) {
-        this.ctx = ctx;
-        this.button = button;
+    public ShazamRecorderHelper(File outputFile, int recordMs, Callbacks cb) {
         this.outputFile = outputFile;
         this.recordMs = recordMs;
         this.callbacks = cb;
@@ -39,21 +34,20 @@ public class ShazamRecorderHelper {
         busy = true;
         recorder = new AudioRecorder(outputFile);
         try {
-            if (button != null) button.setEnabled(false);
             recorder.startRecording();
             if (callbacks != null) callbacks.onRecordingStarted();
             handler.postDelayed(this::stop, recordMs);
         } catch (Exception e) {
-            Toast.makeText(ctx, "Erro ao iniciar gravação", Toast.LENGTH_SHORT).show();
             cleanup(true);
-            if (callbacks != null) callbacks.onRecordingFinished(null);
+            if (callbacks != null) {
+                callbacks.onError(e);
+                callbacks.onRecordingFinished(null);
+            }
         }
     }
 
     public void stop() {
         try { if (recorder != null) recorder.stopRecording(); } catch (Exception ignore) {}
-        if (button != null) button.setEnabled(true);
-
         File result = (outputFile.exists() && outputFile.length() > 0) ? outputFile : null;
         if (callbacks != null) callbacks.onRecordingFinished(result);
         cleanup(false);

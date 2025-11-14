@@ -35,7 +35,7 @@ public class ShazamViewModel extends ViewModel {
 
     /** envia o ficheiro gravado para reconhecimento */
     public void startRecognition(File audioFile) {
-        if (running.get()) return; // já há uma deteção em curso
+        if (running.get()) return;
         if (audioFile == null || !audioFile.exists() || audioFile.length() == 0L) {
             _state.postValue(ShazamUiState.error("Ficheiro de áudio inválido"));
             return;
@@ -59,12 +59,11 @@ public class ShazamViewModel extends ViewModel {
         });
     }
 
-    /** opcional: permitir abortar / limpar estado do UI */
+
     public void cancel() {
         _state.postValue(ShazamUiState.idle());
         running.set(false);
-        // Nota: não interrompe chamadas já em curso no Retrofit (aqui não temos o Call).
-        // Se precisares de cancelar a request, expõe o Call no repo e faz call.cancel().
+
     }
 
     @Override protected void onCleared() {

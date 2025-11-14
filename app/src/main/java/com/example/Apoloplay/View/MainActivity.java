@@ -28,6 +28,7 @@ import com.example.Apoloplay.domain.model.Music;
 import com.example.Apoloplay.ui.main.MainViewModel;
 import com.example.Apoloplay.ui.main.ShazamViewModel;
 import com.example.Apoloplay.ui.player.PlayerViewModel;
+import com.example.Apoloplay.ui.shazam.ShazamUiCallbacks;
 import com.example.Apoloplay.ui.shazam.ShazamUiState;
 import com.example.Apoloplay.ui.trending.CarouselViewModel;
 import com.example.Apoloplay.ui.trending.TrendingCarouselAdapter;
@@ -48,36 +49,45 @@ public class MainActivity extends AppCompatActivity {
     // ---- Search ----
     public static final String EXTRA_INITIAL_QUERY = "EXTRA_INITIAL_QUERY";
 
+    // ---- ViewModels ----
     private PlayerViewModel playerVm;
     private MainViewModel mainVm;
     private CarouselViewModel carouselVm;
     private ShazamViewModel shazamVm;
 
-    // Views
+    // ---- Views ----
     private View root, searchBar;
     private EditText searchInput;
     private ImageButton searchIcon, shazamButton, btnOpenPlaylists;
 
-    // Carrossel
+    // ---- Carrossel ----
     private RecyclerView rvTrending;
     private TrendingCarouselAdapter adapter;
     private LinearLayoutManager lm;
     private TrendingCarouselHelper carouselHelper;
 
-    // Shazam
+    // ---- Shazam ----
     private ShazamRecorderHelper shazamHelper;
+    private ShazamUiCallbacks shazamCallbacks;
+    private static final int SHAZAM_RECORD_MS = 12_000; // 12s
     private File recordedAudioFile;
 
+    // ---- Navegação pendente ----
     private Runnable pendingAfterLogin;
 
-    // Permissões (microfone)
+
+    private ViewTreeObserver.OnGlobalLayoutListener kbListener;
+
+    // ---- Permissões (microfone) ----
     private final ActivityResultLauncher<String> micPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
                 if (granted) startShazamCapture();
                 else toast("Permissão de áudio necessária para o Shazam.");
             });
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    // ---- Ciclo de vida ----
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_auth);
 
@@ -88,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
         shazamVm   = new ViewModelProvider(this).get(ShazamViewModel.class);
 
         // Views
-        root            = findViewById(R.id.root);
-        searchBar       = findViewById(R.id.search_bar_container);
-        searchInput     = findViewById(R.id.searchInput);
-        searchIcon      = findViewById(R.id.btn_search_icon);
-        shazamButton    = findViewById(R.id.btn_shazam);
-        btnOpenPlaylists= findViewById(R.id.btn_open_playlists);
+        root             = findViewById(R.id.root);
+        searchBar        = findViewById(R.id.search_bar_container);
+        searchInput      = findViewById(R.id.searchInput);
+        searchIcon       = findViewById(R.id.btn_search_icon);
+        shazamButton     = findViewById(R.id.btn_shazam);
+        btnOpenPlaylists = findViewById(R.id.btn_open_playlists);
 
         // Carrossel
         rvTrending = findViewById(R.id.rv_trending);
@@ -122,21 +132,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Shazam
         recordedAudioFile = new File(getCacheDir(), "shazam_recording.m4a");
+
+        shazamCallbacks = new ShazamUiCallbacks(
+                shazamVm,
+                shazamButton,
+                this::toast // podes trocar por Snackbar depois sem tocar no helper
+        );
+
         shazamHelper = new ShazamRecorderHelper(
-                this, shazamButton, recordedAudioFile, 12_000,
-                new ShazamRecorderHelper.Callbacks() {
-                    @Override public void onRecordingStarted() {
-                        shazamVm.startRecording();
-                        toast("A gravar ~12 segundos…");
-                    }
-                    @Override public void onRecordingFinished(File f) {
-                        if (f != null) shazamVm.startRecognition(f);
-                        else toast("Erro: áudio vazio ou inválido.");
-                    }
-                });
+                recordedAudioFile,
+                SHAZAM_RECORD_MS,
+                shazamCallbacks
+        );
+
         if (shazamButton != null) {
             shazamButton.setOnClickListener(v -> {
-                if (shazamHelper.isBusy()) return;
+                if (shazamHelper.isBusy()) return; // evita duplo clique
                 checkMicPermissionAndStart();
             });
         }
@@ -145,32 +156,43 @@ public class MainActivity extends AppCompatActivity {
         mainVm.getTrending().observe(this, this::renderTrending);
         shazamVm.getState().observe(this, this::renderShazam);
 
+        // Layout/IME
         installKeyboardVisibilityListener();
 
-        // arranque: login + trending
+        // Arranque: login + trending
         ensureLoginThen(this::ensureTrendingLoaded);
     }
 
-    // Ciclo de vida
-    @Override protected void onResume() { super.onResume(); carouselHelper.onResume(); }
-    @Override protected void onPause()  { super.onPause();  carouselHelper.onPauseOrStop(); }
-    @Override protected void onStop()   { super.onStop();   carouselHelper.onPauseOrStop(); }
-    @Override protected void onDestroy(){ super.onDestroy(); if (shazamHelper!=null) shazamHelper.cancelNow(); }
+    @Override protected void onResume()  { super.onResume();  carouselHelper.onResume(); }
+    @Override protected void onPause()   { super.onPause();   carouselHelper.onPauseOrStop(); }
+    @Override protected void onStop()    { super.onStop();    carouselHelper.onPauseOrStop(); }
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        if (shazamHelper != null) shazamHelper.cancelNow();
+        if (kbListener != null && root != null) {
+            root.getViewTreeObserver().removeOnGlobalLayoutListener(kbListener);
+        }
+    }
 
-    // Render
-    private void renderTrending(List<Music> list) { carouselHelper.bindAndCenter(list); }
+    // ---- Render ----
+    private void renderTrending(List<Music> list) {
+        carouselHelper.bindAndCenter(list);
+    }
 
     private void renderShazam(ShazamUiState state) {
         if (state == null) return;
 
-        boolean enable = state.getStatus() == ShazamUiState.Status.IDLE
-                || state.getStatus() == ShazamUiState.Status.DATA
-                || state.getStatus() == ShazamUiState.Status.ERROR;
-        if (shazamButton != null) shazamButton.setEnabled(enable);
+        // Deixa a gestão do botão nas callbacks para evitar "braço-de-ferro"
 
         switch (state.getStatus()) {
-            case RECORDING: toastOnce("A gravar áudio…"); break;
-            case LOADING:   toastOnce("A reconhecer…");   break;
+            case RECORDING:
+                // feedback de gravação já é mostrado pelas callbacks
+                break;
+
+            case LOADING:
+                toastOnce("A reconhecer…");
+                break;
+
             case DATA: {
                 Music m = state.getMusic();
                 if (m != null) {
@@ -180,21 +202,25 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             }
+
             case ERROR:
                 toastOnce("Erro: " + (state.getError() != null ? state.getError() : "desconhecido"));
                 break;
-            default: break;
+
+            default:
+                break;
         }
     }
 
-
-    // Spotify Auth
+    // ---- Spotify Auth ----
     private void ensureLoginThen(Runnable afterLogin) {
         String token = ServiceLocator.sessionProvider().getUserAccessToken();
         if (token == null || token.isEmpty()) {
             startSpotifyLogin();
             pendingAfterLogin = afterLogin;
-        } else afterLogin.run();
+        } else {
+            afterLogin.run();
+        }
     }
 
     private void startSpotifyLogin() {
@@ -226,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Search
+    // ---- Search ----
     private void openSearchIfAny() {
         String q = (searchInput != null) ? searchInput.getText().toString().trim() : "";
         if (!q.isEmpty()) {
@@ -236,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Shazam permissões
+    // ---- Shazam permissões/captura ----
     private void checkMicPermissionAndStart() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -247,18 +273,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startShazamCapture() {
-        toastOnce("A gravar ~12 segundos...");
         shazamHelper.start();
     }
 
-    // Trending boot
+    // ---- Trending boot ----
     private void ensureTrendingLoaded() {
         List<Music> cur = mainVm.getTrending().getValue();
         if (cur == null || cur.isEmpty()) mainVm.loadTrending();
         else carouselHelper.onResume();
     }
 
-    // Navegação / util
+    // ---- Navegação / util ----
     private void openDetails(Music m) {
         Intent i = new Intent(this, DetailsActivity.class);
         i.putExtra("MUSIC_DETAILS", m);
@@ -267,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void installKeyboardVisibilityListener() {
         if (root == null || searchBar == null) return;
-        root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        kbListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override public void onGlobalLayout() {
                 Rect r = new Rect();
                 root.getWindowVisibleDisplayFrame(r);
@@ -276,7 +301,8 @@ public class MainActivity extends AppCompatActivity {
                 boolean kbVisible = keypadHeight > screenHeight * 0.15;
                 adjustSearchBarForVisibleFrame(r, kbVisible);
             }
-        });
+        };
+        root.getViewTreeObserver().addOnGlobalLayoutListener(kbListener);
     }
 
     private void adjustSearchBarForVisibleFrame(Rect visibleFrame, boolean kbVisible) {
@@ -292,6 +318,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String lastToastMsg = null;
-    private void toastOnce(String msg){ if (msg!=null && !msg.equals(lastToastMsg)) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); lastToastMsg = msg; } }
+    private void toastOnce(String msg){
+        if (msg!=null && !msg.equals(lastToastMsg)) {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            lastToastMsg = msg;
+        }
+    }
     private void toast(String msg){ Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 }
