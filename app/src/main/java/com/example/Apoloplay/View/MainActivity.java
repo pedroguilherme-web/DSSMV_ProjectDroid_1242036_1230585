@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     // ---- Navegação pendente ----
     private Runnable pendingAfterLogin;
 
-
+    // ---- IME listener (para remover no onDestroy) ----
     private ViewTreeObserver.OnGlobalLayoutListener kbListener;
 
     // ---- Permissões (microfone) ----

@@ -5,7 +5,7 @@
     <string name="music_cover_description">Capa do álbum da música.</string>
     <string name="definicoes">definições</string>
     <string name="search">search</string>
-    <string name="search_songs_artists">search songs</string>
+    <string name="search_songs_artists">Procurar músicas</string>
     <!-- Erros amigáveis -->
     <string name="error_duplicate">Erro-Duplicado</string>
     <string name="error_session_expired">Sessão expirada. Inicia sessão novamente.</string>

@@ -48,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:contentDescription="@string/ver_playlists"
+            app:backgroundTint="#141E3A"
             app:srcCompat="@drawable/add"
             app:layout_anchor="@id/swipe"
             app:layout_anchorGravity="bottom|end" />
