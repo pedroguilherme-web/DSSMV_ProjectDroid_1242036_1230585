@@ -1,6 +1,6 @@
 package com.example.Apoloplay.ui.shazam;
 
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 
 /**
  * Representa o estado da interface do Shazam.
@@ -26,7 +26,6 @@ public class ShazamUiState {
         this.error = error;
     }
 
-    // --- Fábricas estáticas para manter o código limpo ---
     public static ShazamUiState idle()      { return new ShazamUiState(Status.IDLE, null, null); }
     public static ShazamUiState recording() { return new ShazamUiState(Status.RECORDING, null, null); }
     public static ShazamUiState loading()   { return new ShazamUiState(Status.LOADING, null, null); }

@@ -1,20 +1,19 @@
 // app/src/main/java/com/example/Apoloplay/data/repository/ShazamRepositoryImpl.java
-package com.example.Apoloplay.data.repository;
+package com.example.Apoloplay.data.repository.implementation;
 
 import android.media.MediaMetadataRetriever;
 import android.util.Log;
 
 import com.example.Apoloplay.data.mapper.ShazamMapper;
 import com.example.Apoloplay.data.remote.ShazamApiService;
-import com.example.Apoloplay.data.remote.shazam.dto.ShazamResponseDTO;
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.repository.ShazamRepository;
+import com.example.Apoloplay.data.remote.dto.shazam.ShazamResponseDTO;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.repository.interfaces.ShazamRepository;
 import com.example.Apoloplay.utils.Constants;
 
 import java.io.File;
 
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 

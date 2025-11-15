@@ -1,4 +1,4 @@
-package com.example.Apoloplay.domain.model;
+package com.example.Apoloplay.data.model;
 
 import java.io.Serializable;
 

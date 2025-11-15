@@ -1,7 +1,6 @@
 package com.example.Apoloplay.data.remote;
 
-import com.example.Apoloplay.data.remote.shazam.dto.ShazamResponseDTO;
-import okhttp3.MultipartBody;
+import com.example.Apoloplay.data.remote.dto.shazam.ShazamResponseDTO;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;

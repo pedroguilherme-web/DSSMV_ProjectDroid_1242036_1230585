@@ -1,7 +1,6 @@
-package com.example.Apoloplay.data.repository;
+package com.example.Apoloplay.data.repository.implementation;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.example.Apoloplay.data.RetrofitProvider;
 import com.example.Apoloplay.data.mapper.MusicMapper;
@@ -9,18 +8,17 @@ import com.example.Apoloplay.data.remote.AuthTokenService;
 import com.example.Apoloplay.data.remote.SpotifyService;
 import com.example.Apoloplay.data.remote.dto.TokenResponseDTO;
 import com.example.Apoloplay.data.remote.dto.search.SpotifySearchResponseDTO;
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.repository.SearchRepository;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.repository.interfaces.SearchRepository;
 
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SearchRepositoryImpl implements SearchRepository {
 
- 
+
     private static final String CLIENT_ID = "7b7105fe7abf4c13911b13a910f79cff";
     private static final String CLIENT_SECRET = "bf5f5e0affaa4a36985591b0a1e767ed";
 

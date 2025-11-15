@@ -1,6 +1,6 @@
-package com.example.Apoloplay.domain.repository;
+package com.example.Apoloplay.data.repository.interfaces;
 
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 import java.io.File;
 
 public interface ShazamRepository {

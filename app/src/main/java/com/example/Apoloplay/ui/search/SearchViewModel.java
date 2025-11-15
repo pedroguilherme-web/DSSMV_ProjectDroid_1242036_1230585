@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.Apoloplay.data.repository.SearchRepositoryImpl;
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.repository.SearchRepository;
+import com.example.Apoloplay.data.repository.implementation.SearchRepositoryImpl;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.repository.interfaces.SearchRepository;
 
 import java.util.List;
 

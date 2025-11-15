@@ -3,7 +3,7 @@ package com.example.Apoloplay.ui.playlists;
 import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Playlist;
 
 public final class PlaylistsUiState {
     public enum Status { LOADING, DATA, ERROR }

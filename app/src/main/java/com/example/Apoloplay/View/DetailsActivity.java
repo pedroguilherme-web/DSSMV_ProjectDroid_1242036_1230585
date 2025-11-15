@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.Apoloplay.R;
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 import com.example.Apoloplay.ui.addtoplaylist.AddToPlaylistSheet;
 import com.example.Apoloplay.ui.details.DetailsUiState;
 import com.example.Apoloplay.ui.details.DetailsViewModel;

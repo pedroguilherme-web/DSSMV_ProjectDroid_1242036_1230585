@@ -1,4 +1,4 @@
-package com.example.Apoloplay.domain.model;
+package com.example.Apoloplay.data.model;
 
 /** Domínio: Playlist (encapsulado, imutável) */
 public class Playlist {

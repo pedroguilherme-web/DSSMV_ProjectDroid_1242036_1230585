@@ -1,4 +1,4 @@
-package com.example.Apoloplay.data.remote.shazam.dto;
+package com.example.Apoloplay.data.remote.dto.shazam;
 
 import java.util.List;
 

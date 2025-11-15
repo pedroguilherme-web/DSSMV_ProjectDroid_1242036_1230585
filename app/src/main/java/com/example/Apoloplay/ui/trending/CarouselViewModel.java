@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 
 import java.util.List;
 

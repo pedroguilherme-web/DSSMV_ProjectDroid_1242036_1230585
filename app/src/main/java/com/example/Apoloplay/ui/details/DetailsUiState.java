@@ -1,6 +1,6 @@
 package com.example.Apoloplay.ui.details;
 
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 
 public class DetailsUiState {
     public enum Status { IDLE, LOADING, DATA, ERROR }

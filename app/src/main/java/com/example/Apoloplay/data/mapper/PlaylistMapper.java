@@ -5,8 +5,8 @@ import com.example.Apoloplay.data.remote.dto.PlaylistTrackItemDTO;
 import com.example.Apoloplay.data.remote.dto.PlaylistTracksResponseDTO;
 import com.example.Apoloplay.data.remote.dto.PlaylistsResponseDTO;
 import com.example.Apoloplay.data.remote.dto.SpotifyTrackDTO;
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.model.Playlist;
 
 import java.util.ArrayList;
 import java.util.List;

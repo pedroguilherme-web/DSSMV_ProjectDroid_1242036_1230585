@@ -2,7 +2,7 @@ package com.example.Apoloplay.ui.addtoplaylist;
 
 import androidx.annotation.Nullable;
 
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Playlist;
 
 import java.util.Collections;
 import java.util.List;

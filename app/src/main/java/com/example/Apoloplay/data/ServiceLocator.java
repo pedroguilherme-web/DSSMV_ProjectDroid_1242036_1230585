@@ -2,12 +2,15 @@
 package com.example.Apoloplay.data;
 
 import com.example.Apoloplay.data.auth.SpotifySessionProvider;
+import com.example.Apoloplay.data.mapper.MusicMapper;
 import com.example.Apoloplay.data.remote.SpotifyService;
 import com.example.Apoloplay.data.remote.ShazamApiService;   // <- pacote certo
-import com.example.Apoloplay.data.repository.PlaylistsRepositoryImpl;
-import com.example.Apoloplay.data.repository.ShazamRepositoryImpl;
-import com.example.Apoloplay.domain.repository.PlaylistsRepository;
-import com.example.Apoloplay.domain.repository.ShazamRepository;
+import com.example.Apoloplay.data.repository.implementation.PlaylistsRepositoryImpl;
+import com.example.Apoloplay.data.repository.implementation.ShazamRepositoryImpl;
+import com.example.Apoloplay.data.repository.implementation.TrendingRepositoryImpl;
+import com.example.Apoloplay.data.repository.interfaces.PlaylistsRepository;
+import com.example.Apoloplay.data.repository.interfaces.ShazamRepository;
+import com.example.Apoloplay.data.repository.interfaces.TrendingRepository;
 
 
 public final class ServiceLocator {
@@ -72,5 +75,23 @@ public final class ServiceLocator {
     }
 
 
+
+    // -------- Trending --------
+    private static TrendingRepository trendingRepository;
+
+    public static TrendingRepository trendingRepository() {
+        if (trendingRepository == null) {
+            trendingRepository = new TrendingRepositoryImpl(
+                    spotifyService(),
+                    sessionProvider(),
+                    new MusicMapper()
+            );
+        }
+        return trendingRepository;
+    }
+
+
 }
+
+
 

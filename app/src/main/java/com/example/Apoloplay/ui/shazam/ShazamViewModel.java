@@ -1,13 +1,12 @@
-package com.example.Apoloplay.ui.main;
+package com.example.Apoloplay.ui.shazam;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.Apoloplay.data.ServiceLocator;
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.repository.ShazamRepository;
-import com.example.Apoloplay.ui.shazam.ShazamUiState;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.repository.interfaces.ShazamRepository;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;

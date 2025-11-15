@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Apoloplay.R;
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Playlist;
 
 import java.util.ArrayList;
 import java.util.List;

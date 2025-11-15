@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.Apoloplay.data.ServiceLocator;
-import com.example.Apoloplay.domain.model.Playlist;
-import com.example.Apoloplay.domain.repository.PlaylistsRepository;
+import com.example.Apoloplay.data.model.Playlist;
+import com.example.Apoloplay.data.repository.interfaces.PlaylistsRepository;
 
 import java.util.List;
 

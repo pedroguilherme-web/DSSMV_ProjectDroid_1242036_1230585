@@ -1,4 +1,4 @@
-package com.example.Apoloplay.data.repository;
+package com.example.Apoloplay.data.repository.implementation;
 
 import android.util.Log;
 
@@ -12,7 +12,7 @@ import com.example.Apoloplay.data.remote.dto.PlaylistTrackItemDTO;
 import com.example.Apoloplay.data.remote.dto.PlaylistTracksResponseDTO;
 import com.example.Apoloplay.data.remote.dto.PlaylistsResponseDTO;
 import com.example.Apoloplay.data.remote.dto.RemoveTracksRequest;
-import com.example.Apoloplay.domain.repository.PlaylistsRepository;
+import com.example.Apoloplay.data.repository.interfaces.PlaylistsRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,16 +71,19 @@ public class PlaylistsRepositoryImpl implements PlaylistsRepository {
     public void createPlaylist(String name, String description, boolean isPublic, PlaylistCallback cb) {
         Call<SpotifyService.UserProfileDTO> meCall = api.getMe(bearer());
         enqueueAndTrack(meCall, new Callback<SpotifyService.UserProfileDTO>() {
+
             @Override public void onResponse(Call<SpotifyService.UserProfileDTO> c, Response<SpotifyService.UserProfileDTO> r) {
                 if (!r.isSuccessful() || r.body()==null) { cb.onError(mapHttpToFriendly(r.code())); return; }
                 String userId = r.body().id;
                 CreatePlaylistRequest body = new CreatePlaylistRequest(name, description, isPublic);
                 Call<PlaylistDTO> createCall = api.createPlaylist(bearer(), userId, body);
                 enqueueAndTrack(createCall, new Callback<PlaylistDTO>() {
+
                     @Override public void onResponse(Call<PlaylistDTO> c2, Response<PlaylistDTO> r2) {
                         if (r2.isSuccessful() && r2.body()!=null) cb.onSuccess(PlaylistMapper.toDomain(r2.body()));
                         else cb.onError(mapHttpToFriendly(r2.code()));
                     }
+
                     @Override public void onFailure(Call<PlaylistDTO> c2, Throwable t) { cb.onError(networkMsg(t)); }
                 });
             }

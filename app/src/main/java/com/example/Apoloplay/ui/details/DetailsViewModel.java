@@ -9,7 +9,7 @@ import com.example.Apoloplay.data.remote.SpotifyService;
 import com.example.Apoloplay.data.remote.dto.PlaylistTrackItemDTO;
 import com.example.Apoloplay.data.remote.dto.PlaylistTracksResponseDTO;
 import com.example.Apoloplay.data.remote.dto.search.SpotifySearchResponseDTO;
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

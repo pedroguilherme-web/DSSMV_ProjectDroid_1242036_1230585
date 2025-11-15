@@ -4,10 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.repository.TrendingRepository;
+
+import com.example.Apoloplay.data.repository.interfaces.TrendingRepository;
+import com.example.Apoloplay.data.model.Music;
 
 import java.util.List;
+
+import static com.example.Apoloplay.data.ServiceLocator.trendingRepository;
 
 /**
  * ViewModel responsável por fornecer as músicas em tendência
@@ -16,7 +19,8 @@ import java.util.List;
  */
 public class MainViewModel extends ViewModel {
 
-    private final TrendingRepository repository = new TrendingRepository();
+    private final TrendingRepository repository = trendingRepository();
+
 
     private final MutableLiveData<List<Music>> trending = new MutableLiveData<>();
 

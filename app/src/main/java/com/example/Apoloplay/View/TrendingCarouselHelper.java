@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 import com.example.Apoloplay.ui.trending.CarouselUiState;
 import com.example.Apoloplay.ui.trending.CarouselViewModel;
 import com.example.Apoloplay.ui.trending.TrendingCarouselAdapter;

@@ -1,7 +1,7 @@
-package com.example.Apoloplay.domain.repository;
+package com.example.Apoloplay.data.repository.interfaces;
 
-import com.example.Apoloplay.domain.model.Music;
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Music;
+import com.example.Apoloplay.data.model.Playlist;
 import java.util.List;
 
 public interface PlaylistsRepository {

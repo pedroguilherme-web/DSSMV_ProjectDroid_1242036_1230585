@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Apoloplay.R;
 import com.example.Apoloplay.data.ServiceLocator;
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 import com.example.Apoloplay.ui.search.SearchRowAdapter;
 import com.example.Apoloplay.ui.search.SearchUiState;
 import com.example.Apoloplay.ui.search.SearchViewModel;

@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.Apoloplay.R;
-import com.example.Apoloplay.domain.model.Playlist;
+import com.example.Apoloplay.data.model.Playlist;
 
 import com.example.Apoloplay.ui.playlists.PlaylistRowAdapter;
 import com.example.Apoloplay.ui.playlists.PlaylistsUiState;

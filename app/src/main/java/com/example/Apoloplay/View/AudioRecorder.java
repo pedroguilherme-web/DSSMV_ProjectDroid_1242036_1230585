@@ -25,7 +25,7 @@ public class AudioRecorder {
         recorder = new MediaRecorder();
         try {
             // --- Fonte de áudio ---
-            // usa UNPROCESSED (Android 7+) ou VOICE_RECOGNITION para evitar filtros (AGC/NS)
+
             int source = MediaRecorder.AudioSource.MIC;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 source = MediaRecorder.AudioSource.UNPROCESSED;

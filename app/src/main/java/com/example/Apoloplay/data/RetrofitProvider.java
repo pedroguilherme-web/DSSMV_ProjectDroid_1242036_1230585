@@ -16,7 +16,7 @@ public class RetrofitProvider {
     private static Retrofit shazamRetrofit;
 
     private RetrofitProvider() {
-        // impedir instanciação
+
     }
 
     // Retrofit para endpoints de autenticação (token, etc.)

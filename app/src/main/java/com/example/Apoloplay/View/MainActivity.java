@@ -21,12 +21,15 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+
 
 import com.example.Apoloplay.R;
 import com.example.Apoloplay.data.ServiceLocator;
-import com.example.Apoloplay.domain.model.Music;
+import com.example.Apoloplay.data.model.Music;
 import com.example.Apoloplay.ui.main.MainViewModel;
-import com.example.Apoloplay.ui.main.ShazamViewModel;
+import com.example.Apoloplay.ui.shazam.ShazamViewModel;
 import com.example.Apoloplay.ui.player.PlayerViewModel;
 import com.example.Apoloplay.ui.shazam.ShazamUiCallbacks;
 import com.example.Apoloplay.ui.shazam.ShazamUiState;
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     // ---- Shazam ----
     private ShazamRecorderHelper shazamHelper;
     private ShazamUiCallbacks shazamCallbacks;
-    private static final int SHAZAM_RECORD_MS = 12_000; // 12s
+    private static final int SHAZAM_RECORD_MS = 6_000; // 12s
     private File recordedAudioFile;
 
     // ---- Navegação pendente ----
@@ -152,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+
+
+
         // Observers
         mainVm.getTrending().observe(this, this::renderTrending);
         shazamVm.getState().observe(this, this::renderShazam);
@@ -182,11 +188,35 @@ public class MainActivity extends AppCompatActivity {
     private void renderShazam(ShazamUiState state) {
         if (state == null) return;
 
-        // Deixa a gestão do botão nas callbacks para evitar "braço-de-ferro"
+        // 1) Controlar o botão visualmente conforme o estado
+        if (shazamButton != null) {
+            switch (state.getStatus()) {
+                case RECORDING:
+                case LOADING:
+                    // Botão semi-transparente, desativado e com animação de "processamento"
+                    shazamButton.setEnabled(false);
+                    shazamButton.setAlpha(0.5f);
+                    if (shazamButton.getAnimation() == null) {
+                        shazamButton.startAnimation(createShazamPulseAnimation());
+                    }
+                    break;
 
+                case DATA:
+                case ERROR:
+                case IDLE:
+                default:
+                    // Estado normal: botão opaco, sem animação, ativado
+                    shazamButton.setEnabled(true);
+                    shazamButton.setAlpha(1.0f);
+                    shazamButton.clearAnimation();
+                    break;
+            }
+        }
+
+        // 2) Lógica de toasts/navegação como já tinhas
         switch (state.getStatus()) {
             case RECORDING:
-                // feedback de gravação já é mostrado pelas callbacks
+                // Se quiseres podes pôr um toast aqui, mas não é obrigatório
                 break;
 
             case LOADING:
@@ -207,10 +237,12 @@ public class MainActivity extends AppCompatActivity {
                 toastOnce("Erro: " + (state.getError() != null ? state.getError() : "desconhecido"));
                 break;
 
+            case IDLE:
             default:
                 break;
         }
     }
+
 
     // ---- Spotify Auth ----
     private void ensureLoginThen(Runnable afterLogin) {
@@ -282,6 +314,21 @@ public class MainActivity extends AppCompatActivity {
         if (cur == null || cur.isEmpty()) mainVm.loadTrending();
         else carouselHelper.onResume();
     }
+
+
+    // ---- Animação Shazam ----
+    private Animation createShazamPulseAnimation() {
+        AlphaAnimation anim = new AlphaAnimation(0.4f, 1.0f);
+        anim.setDuration(600);
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setRepeatMode(Animation.REVERSE);
+        return anim;
+    }
+
+
+
+
+
 
     // ---- Navegação / util ----
     private void openDetails(Music m) {
