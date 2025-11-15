@@ -14,59 +14,58 @@ public class AddToPlaylistViewModel extends ViewModel {
 
     private final PlaylistsRepository repo = ServiceLocator.playlistsRepository();
 
-    private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
-    private final MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>();
-    private final MutableLiveData<String> error = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> addSuccess = new MutableLiveData<>(false);
-    private final MutableLiveData<Playlist> created = new MutableLiveData<>();
+    private final MutableLiveData<AddToPlaylistUiState> _state =
+            new MutableLiveData<>(AddToPlaylistUiState.idle());
 
-    public LiveData<Boolean> getLoading() { return loading; }
-    public LiveData<List<Playlist>> getPlaylists() { return playlists; }
-    public LiveData<String> getError() { return error; }
-    public LiveData<Boolean> getAddSuccess() { return addSuccess; }
-    public LiveData<Playlist> getCreatedPlaylist() { return created; }
+    public LiveData<AddToPlaylistUiState> getState() {
+        return _state;
+    }
+
+    // ----- Ações -----
 
     public void refresh() {
-        loading.postValue(true);
-        error.postValue(null);
+        _state.postValue(AddToPlaylistUiState.loading());
         repo.getMyPlaylists(50, 0, new PlaylistsRepository.PlaylistsCallback() {
             @Override public void onSuccess(List<Playlist> data) {
-                loading.postValue(false);
-                playlists.postValue(data);
+                _state.postValue(AddToPlaylistUiState.list(data));
             }
+
             @Override public void onError(String message) {
-                loading.postValue(false);
-                error.postValue(message != null ? message : "Erro a carregar playlists");
+                _state.postValue(AddToPlaylistUiState.error(
+                        message != null ? message : "Erro a carregar playlists"
+                ));
             }
         });
     }
 
     public void create(String name) {
-        loading.postValue(true);
-        error.postValue(null);
-        repo.createPlaylist(name, /*desc*/"", /*public*/false, new PlaylistsRepository.PlaylistCallback() {
+        // opcional: mostrar loading outra vez
+        _state.postValue(AddToPlaylistUiState.loading());
+        repo.createPlaylist(name, "", false, new PlaylistsRepository.PlaylistCallback() {
             @Override public void onSuccess(Playlist playlist) {
-                loading.postValue(false);
-                created.postValue(playlist);
+                // Avisamos a View que criou → ela faz refresh da lista
+                _state.postValue(AddToPlaylistUiState.playlistCreated());
             }
+
             @Override public void onError(String message) {
-                loading.postValue(false);
-                error.postValue(message != null ? message : "Erro a criar playlist");
+                _state.postValue(AddToPlaylistUiState.error(
+                        message != null ? message : "Erro a criar playlist"
+                ));
             }
         });
     }
 
     public void addTrack(String playlistId, String trackUri) {
-        loading.postValue(true);
-        error.postValue(null);
+        _state.postValue(AddToPlaylistUiState.loading());
         repo.addTrackToPlaylist(playlistId, trackUri, new PlaylistsRepository.SimpleCallback() {
             @Override public void onSuccess() {
-                loading.postValue(false);
-                addSuccess.postValue(true);
+                _state.postValue(AddToPlaylistUiState.added());
             }
+
             @Override public void onError(String message) {
-                loading.postValue(false);
-                error.postValue(message != null ? message : "Erro a adicionar faixa");
+                _state.postValue(AddToPlaylistUiState.error(
+                        message != null ? message : "Erro a adicionar faixa"
+                ));
             }
         });
     }
