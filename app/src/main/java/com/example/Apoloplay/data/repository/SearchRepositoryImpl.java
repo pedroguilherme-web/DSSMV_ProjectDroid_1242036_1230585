@@ -20,7 +20,7 @@ import retrofit2.Response;
 
 public class SearchRepositoryImpl implements SearchRepository {
 
-    // ⚠️ para projeto académico — não uses em produção
+ 
     private static final String CLIENT_ID = "7b7105fe7abf4c13911b13a910f79cff";
     private static final String CLIENT_SECRET = "bf5f5e0affaa4a36985591b0a1e767ed";
 
