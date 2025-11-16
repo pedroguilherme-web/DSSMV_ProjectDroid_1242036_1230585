@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+
+actor User
+
+participant "System" as System
+
+
+
+User -> System: Request to create playlist
+System --> User: Asks for playlist name
+User -> System: Submit playlist name
+System --> User: Playlist created
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+'autonumber sequence diagram
+
+actor User
+
+participant "System" as System
+
+
+
+User -> System: Start recognition (microphone)
+System --> System: Analyse audio
+System --> User: Return the song details
+
+@enduml

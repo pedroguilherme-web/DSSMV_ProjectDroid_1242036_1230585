@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+top to bottom direction
+skinparam linetype ortho
+title Domain Model Diagram
+
+class User {
+    - id_token : String
+}
+
+class Music {
+    - title : String
+    - artist : String
+    - imageUrl : String
+    - previewUrl : String
+    - albumName : String
+    - releaseDate : String
+    - spotifyTrackUri : String
+}
+
+class Artist {
+    - name : String
+}
+
+class Playlist {
+    - id : String
+    - name : String
+}
+
+class Album {
+    - name : String
+    - releaseDate : String
+    - imageUrl : String
+}
+
+User "1" -- "*" Playlist : creates
+Artist "1" -- "*" Music : performs
+Album "1" -- "*" Music : contains
+Artist "1" -- "*" Album : produces
+Playlist "1" -- "*" Music : contains
+
+@enduml
