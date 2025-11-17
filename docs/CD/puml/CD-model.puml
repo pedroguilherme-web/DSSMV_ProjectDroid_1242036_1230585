@@ -1,0 +1,92 @@
+@startuml
+
+
+class Music  {
+  - title: String
+  - artist: String
+  - imageUrl: String
+  - spotifyTrackUri: String
+  - albumName: String
+  - releaseDate: String
+}
+
+class Playlist  {
+  - id: String
+  - name: String
+  - tracksTotal: int
+}
+
+interface PlaylistsRepository {
+    + getMyPlaylists(limit, offset, callback)
+    + getPlaylistTracks(playlistId, limit, offset, callback)
+    + createPlaylist(name, description, isPublic, callback)
+    + addTrackToPlaylist(playlistId, trackUri, callback)
+    + removeTrackFromPlaylist(playlistId, trackUri, callback)
+    + deletePlaylist(playlistId, callback)
+    + cancelAll()
+}
+
+interface SearchRepository  {
+    + searchTracks(query, callback)
+}
+
+interface ShazamRepository {
+    + recognize(audioFile): Music
+}
+
+class PlaylistsRepositoryImpl  {
+    - api: SpotifyService
+    - session: SessionProvider
+}
+
+class SearchRepositoryImpl {
+    - api: SpotifyService
+    - appToken: String
+}
+
+class ShazamRepositoryImpl {
+    - api: ShazamApiService
+}
+
+class TrendingRepository {
+    - api: SpotifyService
+}
+
+
+class SpotifyService {
+    + getMyPlaylists(bearer, limit, offset)
+    + searchTracks(bearer, query, type, limit)
+    + createPlaylist(bearer, userId, body)
+    + addTracks(bearer, playlistId, uris)
+    + getPlaylistTracks(bearer, playlistId, limit, offset)
+}
+
+class ShazamApiService  {
+    + recognizeSong(apiKey, apiHost, fileBytes)
+}
+
+class SessionProvider  {
+    - userAccessToken: String
+    + getUserAccessToken(): String
+    + setUserAccessToken(token)
+}
+
+
+
+PlaylistsRepositoryImpl ..|> PlaylistsRepository
+SearchRepositoryImpl ..|> SearchRepository
+ShazamRepositoryImpl ..|> ShazamRepository
+
+PlaylistsRepositoryImpl --> SpotifyService
+PlaylistsRepositoryImpl --> SessionProvider
+SearchRepositoryImpl --> SpotifyService
+ShazamRepositoryImpl --> ShazamApiService
+TrendingRepository --> SpotifyService
+
+PlaylistsRepository --> Playlist
+PlaylistsRepository --> Music
+SearchRepository --> Music
+ShazamRepository --> Music
+TrendingRepository --> Music
+
+@enduml

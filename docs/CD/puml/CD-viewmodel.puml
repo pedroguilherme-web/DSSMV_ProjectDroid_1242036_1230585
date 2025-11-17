@@ -1,0 +1,77 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Music {
+  - title: String
+  - artist: String
+  - imageUrl: String
+  - spotifyTrackUri: String
+  - albumName: String
+  - releaseDate: String
+}
+
+class Playlist  {
+  - id: String
+  - name: String
+  - tracksTotal: int
+}
+
+class TrendingRepository
+class PlaylistsRepository
+class SearchRepository
+class ShazamRepository
+
+class MainViewModel {
+  - repository: TrendingRepository
+  - trending: List<Music>
+}
+
+class SearchViewModel {
+  - repo: SearchRepository
+  - lastQuery: String
+}
+
+class PlaylistsViewModel {
+  - repository: PlaylistsRepository
+  - playlists: List<Playlist>
+}
+
+class PlaylistDetailsViewModel  {
+  - repo: PlaylistsRepository
+  - playlistId: String
+  - tracks: List<Music>
+}
+
+class DetailsViewModel  {
+  - api: SpotifyService
+  - selectedTitle: String
+  - selectedArtist: String
+}
+
+class PlayerViewModel {
+  - currentTrack: Music
+  - isPlaying: boolean
+}
+
+class ShazamViewModel  {
+  - repo: ShazamRepository
+  - isRecording: boolean
+}
+
+
+MainViewModel --> TrendingRepository
+SearchViewModel --> SearchRepository
+PlaylistsViewModel --> PlaylistsRepository
+PlaylistDetailsViewModel --> PlaylistsRepository
+ShazamViewModel --> ShazamRepository
+
+MainViewModel --> Music
+SearchViewModel --> Music
+PlaylistsViewModel --> Playlist
+PlaylistDetailsViewModel --> Playlist
+PlaylistDetailsViewModel --> Music
+DetailsViewModel --> Music
+PlayerViewModel --> Music
+ShazamViewModel --> Music
+
+@enduml

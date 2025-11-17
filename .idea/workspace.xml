@@ -146,16 +146,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81f8f5f6-0275-4e71-affb-c7d8dbe1bb77" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/ModeloDomínio/puml/ModeloDominio.puml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/UC/UC.puml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/US/US5.puml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/US/US8.puml" afterDir="false" />
+    <list default="true" id="81f8f5f6-0275-4e71-affb-c7d8dbe1bb77" name="Changes" comment="SVG">
+      <change afterPath="$PROJECT_DIR$/docs/CD/puml/CD-model.puml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/CD/puml/CD-view.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ModeloClasses/ModeloClasses.puml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ModeloDomínio/ModeloDominio.puml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/SSDS/SSDS.puml" beforeDir="false" afterPath="$PROJECT_DIR$/docs/US/US2.puml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/UseCase/UC.puml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,6 +197,7 @@
         <option value="Class" />
         <option value="UML Use Case" />
         <option value="UML Sequence" />
+        <option value="UML Class" />
       </list>
     </option>
   </component>
@@ -218,7 +216,7 @@
     &quot;accountId&quot;: &quot;d6366c81-2915-4cca-a852-44443d2ee889&quot;
   }
 }</component>
-  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\Asus\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13" javaHome="C:\Users\Asus\.jdks\corretto-21.0.8" gradleVersion="8.13" />
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\Utilizador\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13" javaHome="C:\Users\Utilizador\.jdks\corretto-21.0.8" gradleVersion="8.13" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -234,7 +232,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Android App.app.executor": "Run",
-    "DefaultPlantUmlFileTemplate": "UML Sequence",
+    "DefaultPlantUmlFileTemplate": "UML Class",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -264,8 +262,11 @@
       <recent name="C:\DSSMV2526\DSSMV_ProjectDroid_1242036_1230585\app\src\main\res\layout" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\ModeloDomínio\puml" />
-      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\app\src\main\java\com\example\Apoloplay\shazam" />
+      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\CD" />
+      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\UC\svg" />
+      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\US\svg" />
+      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\UC\puml" />
+      <recent name="C:\Users\Utilizador\Documents\GitHub\DSSMV_ProjectDroid_1242036_1230585\docs\US\puml" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.Apoloplay.data.remote" />
@@ -358,12 +359,22 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="kotlin.scripts.Default Kotlin Gradle Script...\::Users:Utilizador:Documents:GitHub:DSSMV_ProjectDroid_1242036_1230585:app:build.gradle.kts" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="kotlin.scripts.Default Kotlin Gradle Script...\::Users:Utilizador:Documents:GitHub:DSSMV_ProjectDroid_1242036_1230585:app:build.gradle.kts" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -389,9 +400,31 @@
       <workItem from="1763093126715" duration="18304000" />
       <workItem from="1763174096748" duration="18972000" />
     </task>
+    <task id="LOCAL-00001" summary="Models">
+      <option name="closed" value="true" />
+      <created>1763323122446</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763323122446</updated>
+    </task>
+    <task id="LOCAL-00002" summary="SVG">
+      <option name="closed" value="true" />
+      <created>1763323146094</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1763323146094</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Models" />
+    <MESSAGE value="SVG" />
+    <option name="LAST_COMMIT_MESSAGE" value="SVG" />
   </component>
 </project>
